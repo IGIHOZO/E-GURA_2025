@@ -1,0 +1,201 @@
+###
+# Search V2 API Examples
+# Use with REST Client extension in VS Code or import to Postman
+###
+
+@baseUrl = http://localhost:5000/api/v2/search
+@deviceId = device_test_123
+@userId = user_test_456
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Basic Search
+GET {{baseUrl}}?q=dress&deviceId={{deviceId}}
+
+### Search with Filters
+GET {{baseUrl}}?q=red dress&category=clothing&minPrice=10000&maxPrice=50000&deviceId={{deviceId}}
+
+### Search with Multiple Filters
+GET {{baseUrl}}?q=shirt&category=clothing&sizes=M,L&colors=blue,white&inStock=true&deviceId={{deviceId}}
+
+### Search with Sorting
+GET {{baseUrl}}?q=dress&sortBy=price_asc&deviceId={{deviceId}}
+
+### Search - Price Descending
+GET {{baseUrl}}?q=shoes&sortBy=price_desc&deviceId={{deviceId}}
+
+### Search - Newest First
+GET {{baseUrl}}?q=bag&sortBy=newest&deviceId={{deviceId}}
+
+### Search - Highest Rated
+GET {{baseUrl}}?q=dress&sortBy=rating&deviceId={{deviceId}}
+
+### Search - Most Popular
+GET {{baseUrl}}?q=shirt&sortBy=popular&deviceId={{deviceId}}
+
+### Search with Pagination
+GET {{baseUrl}}?q=dress&page=2&limit=10&deviceId={{deviceId}}
+
+### POST Search (Complex Filters)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "query": "red evening dress",
+  "filters": {
+    "category": "clothing",
+    "minPrice": 20000,
+    "maxPrice": 100000,
+    "sizes": ["M", "L", "XL"],
+    "colors": ["red", "burgundy"],
+    "minRating": 4,
+    "inStock": true
+  },
+  "sortBy": "relevance",
+  "page": 1,
+  "limit": 20,
+  "deviceId": "{{deviceId}}",
+  "userId": "{{userId}}"
+}
+
+### Type-Ahead Suggestions
+GET {{baseUrl}}/suggestions?q=dre
+
+### Type-Ahead Suggestions - More Characters
+GET {{baseUrl}}/suggestions?q=dress
+
+### Home Page Recommendations
+GET {{baseUrl}}/reco/home?deviceId={{deviceId}}&limit=20
+
+### Home Page Recommendations (Logged In)
+GET {{baseUrl}}/reco/home?userId={{userId}}&deviceId={{deviceId}}&limit=20
+
+### Related Products
+GET {{baseUrl}}/reco/related/507f1f77bcf86cd799439011?limit=10
+
+### Because You Viewed
+GET {{baseUrl}}/reco/because-you-viewed?deviceId={{deviceId}}&limit=10
+
+### Trending Products (All Categories)
+GET {{baseUrl}}/trending?limit=10
+
+### Trending Products (Specific Category)
+GET {{baseUrl}}/trending?category=clothing&limit=10
+
+### Track Search Event
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "search",
+  "query": "red dress",
+  "deviceId": "{{deviceId}}",
+  "userId": "{{userId}}"
+}
+
+### Track View Event
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "view",
+  "productId": "507f1f77bcf86cd799439011",
+  "deviceId": "{{deviceId}}",
+  "dwellTime": 30
+}
+
+### Track Click Event
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "click",
+  "productId": "507f1f77bcf86cd799439011",
+  "query": "red dress",
+  "deviceId": "{{deviceId}}"
+}
+
+### Track Add to Cart Event
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "add_to_cart",
+  "productId": "507f1f77bcf86cd799439011",
+  "priceAtTime": 45000,
+  "quantity": 1,
+  "deviceId": "{{deviceId}}"
+}
+
+### Track Purchase Event
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "purchase",
+  "productId": "507f1f77bcf86cd799439011",
+  "priceAtTime": 45000,
+  "quantity": 2,
+  "deviceId": "{{deviceId}}",
+  "userId": "{{userId}}"
+}
+
+### Track Wishlist Add
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "wishlist_add",
+  "productId": "507f1f77bcf86cd799439011",
+  "deviceId": "{{deviceId}}"
+}
+
+### Track Category Visit
+POST {{baseUrl}}/track
+Content-Type: application/json
+
+{
+  "eventType": "category_visit",
+  "category": "clothing",
+  "deviceId": "{{deviceId}}"
+}
+
+### Admin: Trigger Incremental Indexing
+POST {{baseUrl}}/admin/index
+Content-Type: application/json
+
+{
+  "type": "updated"
+}
+
+### Admin: Trigger Full Indexing (Background)
+POST {{baseUrl}}/admin/index
+Content-Type: application/json
+
+{
+  "type": "all"
+}
+
+### Admin: Get Index Status
+GET {{baseUrl}}/admin/index/status
+
+### Admin: Clear All Cache
+POST {{baseUrl}}/admin/cache/clear
+Content-Type: application/json
+
+{}
+
+### Admin: Clear User Cache
+POST {{baseUrl}}/admin/cache/clear
+Content-Type: application/json
+
+{
+  "pattern": "personalized:{{deviceId}}"
+}
+
+### Admin: Get Cache Stats
+GET {{baseUrl}}/admin/cache/stats
+
+### Test Rate Limiting (Send Multiple Times)
+GET {{baseUrl}}?q=test&deviceId={{deviceId}}

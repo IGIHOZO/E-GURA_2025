@@ -1,0 +1,10 @@
+{
+  "freeShippingEnabled": true,
+  "freeShippingType": "selected",
+  "standardShippingFee": 2000,
+  "freeShippingThreshold": 0,
+  "selectedProducts": [
+    "0f7e7f3f-ab54-4c30-bf93-146ca6007955",
+    "b109db05-90b9-43ac-8459-b1026d4ee058"
+  ]
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Frontend Diagnostic Test</h1>
+    
+    <div class="section">
+        <h2>Step 1: Test Backend Connection</h2>
+        <button onclick="testBackend()">Test Backend</button>
+        <div id="backend-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 2: Test Products API</h2>
+        <button onclick="testProducts()">Test Products</button>
+        <div id="products-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 3: Test React App Load</h2>
+        <button onclick="testReactApp()">Test React App</button>
+        <div id="react-result"></div>
+    </div>
+
+    <script>
+        async function testBackend() {
+            const result = document.getElementById('backend-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                const data = await response.json();
+                result.innerHTML = `<p class="success">✅ Backend Connected</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Backend Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testProducts() {
+            const result = document.getElementById('products-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/products?limit=3');
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    result.innerHTML = `
+                        <p class="success">✅ Products Found: ${data.data.length}</p>
+                        <p>First product: ${data.data[0].name}</p>
+                        <p>Image: ${data.data[0].mainImage || 'No image'}</p>
+                        <pre>${JSON.stringify(data.data[0], null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `<p class="error">❌ No products in database</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Products Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testReactApp() {
+            const result = document.getElementById('react-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:4000');
+                const html = await response.text();
+                
+                if (html.includes('root')) {
+                    result.innerHTML = `<p class="success">✅ React App HTML loads correctly</p>`;
+                    
+                    // Test if React bundle loads
+                    const scriptMatch = html.match(/src="([^"]*index[^"]*\.js)"/);
+                    if (scriptMatch) {
+                        result.innerHTML += `<p class="success">✅ Found React bundle: ${scriptMatch[1]}</p>`;
+                    }
+                } else {
+                    result.innerHTML = `<p class="error">❌ React App HTML missing root element</p>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ React App Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-run tests
+        window.onload = () => {
+            console.log('Running auto-tests...');
+            testBackend();
+            setTimeout(testProducts, 1000);
+            setTimeout(testReactApp, 2000);
+        };
+    </script>
+</body>
+</html>

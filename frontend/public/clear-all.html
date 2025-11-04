@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        button:hover { background: #5568d3; transform: translateY(-2px); }
+        .result { margin-top: 20px; padding: 15px; border-radius: 10px; }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear Browser Storage</h1>
+        <p>This will fix all localStorage quota errors</p>
+        
+        <button onclick="clearAll()">Clear Everything</button>
+        <button onclick="checkStorage()">Check Storage</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function clearAll() {
+            try {
+                // Clear localStorage
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                // Clear specific problematic items
+                const keysToRemove = [
+                    'cart',
+                    'cachedProducts',
+                    'adminProducts',
+                    'user',
+                    'token',
+                    'userId',
+                    'wishlist',
+                    'recentSearches',
+                    'userBehavior'
+                ];
+                
+                keysToRemove.forEach(key => {
+                    try {
+                        localStorage.removeItem(key);
+                    } catch (e) {}
+                });
+                
+                showResult('✅ All storage cleared successfully!', 'success');
+                
+                // Reload after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+                
+            } catch (error) {
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        function checkStorage() {
+            try {
+                let total = 0;
+                let items = {};
+                
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        const size = localStorage[key].length;
+                        total += size;
+                        items[key] = (size / 1024).toFixed(2) + ' KB';
+                    }
+                }
+                
+                const totalMB = (total / 1024 / 1024).toFixed(2);
+                
+                let html = `<div class="info">`;
+                html += `<strong>Total Storage: ${totalMB} MB</strong><br><br>`;
+                html += `<div style="text-align: left;">`;
+                
+                for (let key in items) {
+                    html += `${key}: ${items[key]}<br>`;
+                }
+                
+                html += `</div></div>`;
+                
+                document.getElementById('result').innerHTML = html;
+                
+            } catch (error) {
+                showResult('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.className = 'result ' + type;
+            result.textContent = message;
+        }
+    </script>
+</body>
+</html>

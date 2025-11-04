@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        .loading { display: inline-block; margin-left: 10px; }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 E-Gura Store - System Diagnostic</h1>
+        
+        <div class="test-section">
+            <h2>1. Backend Health Check</h2>
+            <button onclick="testBackend()">Test Backend</button>
+            <div id="backend-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Products API Test</h2>
+            <button onclick="testProducts()">Test Products</button>
+            <div id="products-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. React App Test</h2>
+            <button onclick="testReact()">Test React</button>
+            <div id="react-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Browser Console Errors</h2>
+            <div id="console-errors" class="info">
+                Check your browser console (F12 → Console tab) for JavaScript errors.
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Quick Actions</h2>
+            <button onclick="window.location.href='/'">Go to Homepage</button>
+            <button onclick="window.location.href='/admin/login'">Go to Admin Login</button>
+            <button onclick="location.reload()">Refresh Page</button>
+        </div>
+    </div>
+
+    <script>
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            console.log('🔍 Diagnostic page loaded');
+            testBackend();
+            setTimeout(testProducts, 1000);
+            setTimeout(testReact, 2000);
+        });
+
+        async function testBackend() {
+            const result = document.getElementById('backend-result');
+            result.innerHTML = '<div class="info">Testing... <span class="spinner"></span></div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    result.innerHTML = `
+                        <div class="success">✅ Backend is running!</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="warning">⚠️ Backend responded but status is not OK</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">❌ Backend is NOT running!</div>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure backend is started: <code>cd backend && npm start</code></p>
+                `;
+            }
+        }
+
+        async function testProducts() {
+            const result = document.getElementById('products-result');
+            result.innerHTML = '<div class="info">Testing... <span class="spinner"></span></div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/products?limit=3');
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    result.innerHTML = `
+                        <div class="success">✅ Products API working! Found ${data.data.length} products</div>
+                        <p><strong>First product:</strong> ${data.data[0].name}</p>
+                        <p><strong>Price:</strong> ${data.data[0].price} RWF</p>
+                        <p><strong>Image:</strong> ${data.data[0].mainImage || 'No image'}</p>
+                        <pre>${JSON.stringify(data.data[0], null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="warning">⚠️ No products found in database</div>
+                        <p>You need to add products through the admin panel.</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">❌ Products API failed!</div>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testReact() {
+            const result = document.getElementById('react-result');
+            result.innerHTML = '<div class="info">Testing... <span class="spinner"></span></div>';
+            
+            try {
+                const response = await fetch('http://localhost:4000');
+                const html = await response.text();
+                
+                // Check for key indicators
+                const hasRoot = html.includes('id="root"');
+                const hasReactScript = html.includes('type="module"');
+                const hasVite = html.includes('@vite') || html.includes('/@react-refresh');
+                
+                if (hasRoot && (hasReactScript || hasVite)) {
+                    result.innerHTML = `
+                        <div class="success">✅ React app HTML is correct</div>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>✅ Root div found</li>
+                            <li>✅ Module scripts found</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>If homepage is still blank:</strong></p>
+                        <ol style="margin-left: 20px;">
+                            <li>Press F12 to open DevTools</li>
+                            <li>Check Console tab for JavaScript errors</li>
+                            <li>Look for "require is not defined" or other errors</li>
+                        </ol>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">❌ React app HTML is incorrect</div>
+                        <p>Missing: ${!hasRoot ? 'Root div' : ''} ${!hasReactScript && !hasVite ? 'Scripts' : ''}</p>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">❌ Frontend dev server not running!</div>
+                    <p>Error: ${error.message}</p>
+                    <p>Start it with: <code>cd frontend && npm run dev</code></p>
+                `;
+            }
+        }
+
+        // Capture console errors
+        window.addEventListener('error', (e) => {
+            const errDiv = document.getElementById('console-errors');
+            errDiv.innerHTML += `<div class="error">Error: ${e.message}<br>File: ${e.filename}:${e.lineno}</div>`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Auth Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.login {
+            background: #2196F3;
+        }
+        button.login:hover {
+            background: #0b7dda;
+        }
+        #output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .error {
+            color: #ff4444;
+        }
+        .info {
+            color: #ffaa00;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Admin Authentication Tester</h1>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <strong>⚠️ IMPORTANT: Run "Setup Admin" first before trying to login!</strong>
+        </div>
+
+        <div>
+            <button onclick="setupAdmin()">1️⃣ Setup Admin Account</button>
+            <button onclick="checkHealth()">Check Backend Status</button>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Login Test</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="admin@sewithdebby.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" value="Admin@123">
+            </div>
+            <button class="login" onclick="loginAdmin()">2️⃣ Test Login</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function checkHealth() {
+            log('🔍 Checking backend health...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/health`);
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    log('✅ Backend is running!', 'success');
+                    log(`   Database: ${data.database}`, 'info');
+                    log(`   DB Type: ${data.dbType}`, 'info');
+                } else {
+                    log('❌ Backend health check failed', 'error');
+                }
+            } catch (error) {
+                log('❌ Cannot connect to backend! Make sure it\'s running on port 5000', 'error');
+                log(`   Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function setupAdmin() {
+            log('🔧 Setting up admin account...', 'info');
+            log('   Email: admin@sewithdebby.com', 'info');
+            log('   Password: Admin@123', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/admin/auth/setup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('✅ SUCCESS! Admin account ready!', 'success');
+                    log(`   ${data.message}`, 'success');
+                    log('   You can now test login!', 'success');
+                } else {
+                    log('❌ Setup failed:', 'error');
+                    log(`   ${data.message}`, 'error');
+                    if (data.error) {
+                        log(`   Error: ${data.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log('❌ Setup request failed!', 'error');
+                log(`   Error: ${error.message}`, 'error');
+                log('   Make sure backend is running!', 'error');
+            }
+        }
+
+        async function loginAdmin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('🔐 Attempting login...', 'info');
+            log(`   Email: ${email}`, 'info');
+            log(`   Password: ${'*'.repeat(password.length)}`, 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/admin/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    log('✅ LOGIN SUCCESSFUL!', 'success');
+                    log(`   User: ${data.data.user.firstName} ${data.data.user.lastName}`, 'success');
+                    log(`   Email: ${data.data.user.email}`, 'success');
+                    log(`   Role: ${data.data.user.role}`, 'success');
+                    log(`   Token: ${data.data.token.substring(0, 20)}...`, 'success');
+                    log('', 'info');
+                    log('🎉 Admin authentication is working!', 'success');
+                } else {
+                    log('❌ LOGIN FAILED!', 'error');
+                    log(`   Status: ${response.status}`, 'error');
+                    log(`   Message: ${data.message}`, 'error');
+                    if (data.error) {
+                        log(`   Error: ${data.error}`, 'error');
+                    }
+                    
+                    if (response.status === 401 && data.message.includes('setup')) {
+                        log('', 'info');
+                        log('💡 TIP: Click "Setup Admin Account" button first!', 'info');
+                    }
+                }
+            } catch (error) {
+                log('❌ Login request failed!', 'error');
+                log(`   Error: ${error.message}`, 'error');
+                log('   Make sure backend is running!', 'error');
+            }
+        }
+
+        // Auto-check backend on load
+        window.onload = function() {
+            log('👋 Admin Auth Tester Ready!', 'success');
+            log('', 'info');
+            checkHealth();
+        };
+    </script>
+</body>
+</html>
