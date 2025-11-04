@@ -26,3 +26,4 @@ pnpm-debug.log*
 
 # Misc
 .DS_Store
+.early.coverage

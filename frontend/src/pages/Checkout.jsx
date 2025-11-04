@@ -39,6 +39,7 @@ const Checkout = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [notification, setNotification] = useState(null);
   
   // Handle auth completion - FIXED to use correct current user data
   const handleAuthComplete = async (userData) => {
@@ -515,7 +516,6 @@ const Checkout = () => {
     setIsLoading(true);
     setPaymentStatus('pending');
     
-    // Force success - bypass all APIs
     try {
       console.log('📦 Creating order...');
       
@@ -532,10 +532,10 @@ const Checkout = () => {
         shippingCost: shippingCost,
         paymentMethod: paymentMethod === 'mobile_money' ? 'Mobile Money' : 'Cash on Delivery',
         paymentInfo: {
-          method: paymentMethod === 'mobile_money' ? 'MTN Mobile Money' : 'Cash on Delivery',
+          method: paymentMethod === 'mobile_money' ? 'Mobile Money (InTouch Pay)' : 'Cash on Delivery',
           phone: phoneNumber || orderDetails.shippingInfo.phoneNumber,
-          transactionId: paymentData.transactionId || `TXN_${Date.now()}`,
-          status: 'completed'
+          transactionId: null,
+          status: 'pending'
         },
         status: 'pending',
         createdAt: new Date().toISOString(),
@@ -574,15 +574,115 @@ const Checkout = () => {
           }
         });
         console.log('✅ Order saved to backend:', backendOrder.data);
-        alert('✅ Order placed successfully! Order #' + backendOrder.data.data.orderNumber);
+        
+        // Get the created order ID from backend
+        const createdOrderId = backendOrder.data.data._id || backendOrder.data.data.id;
+        order.backendOrderId = createdOrderId;
+        
+        // If mobile money payment, initiate InTouch Pay
+        if (paymentMethod === 'mobile_money' && phoneNumber) {
+          console.log('💰 Initiating InTouch Pay payment...');
+          
+          try {
+            const paymentResponse = await axios.post(`/api/payments/orders/pay/${createdOrderId}`, {
+              type: 'momo',
+              phone: phoneNumber
+            });
+            
+            console.log('✅ InTouch Pay response:', paymentResponse.data);
+            
+            if (paymentResponse.data.success) {
+              order.paymentInfo.transactionId = paymentResponse.data.transactionId;
+              order.paymentInfo.status = 'pending';
+              order.paymentInfo.responseCode = paymentResponse.data.responseCode;
+              order.paymentInfo.apiResponse = paymentResponse.data;
+              
+              setNotification({
+                type: 'success',
+                title: 'Payment Request Sent!',
+                message: `Please check your phone (${phoneNumber}) to approve the payment`,
+                details: {
+                  order: order.orderNumber,
+                  transactionId: paymentResponse.data.transactionId,
+                  amount: order.total.toLocaleString() + ' RWF',
+                  status: paymentResponse.data.data?.status || 'Pending'
+                },
+                instructions: [
+                  'Dial *182# on your phone',
+                  'Select "Pending Approvals"',
+                  'Enter your PIN to approve payment',
+                  'You\'ll receive confirmation SMS'
+                ]
+              });
+            } else {
+              throw new Error(paymentResponse.data.message || 'Payment initiation failed');
+            }
+          } catch (paymentError) {
+            console.error('❌ Payment initiation failed:', paymentError);
+            
+            const errorMsg = paymentError.response?.data?.error || paymentError.message;
+            const errorCode = paymentError.response?.data?.responseCode;
+            
+            setNotification({
+              type: 'error',
+              title: 'Payment Failed',
+              message: errorMsg,
+              details: {
+                order: order.orderNumber,
+                errorCode: errorCode
+              },
+              support: {
+                phone: '+250 782 013 955',
+                email: 'egurastore@gmail.com'
+              }
+            });
+            
+            alert(`
+━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ PAYMENT FAILED
+━━━━━━━━━━━━━━━━━━━━━━━
+
+Order: ${order.orderNumber}
+Error: ${errorMsg}
+${errorCode ? 'Code: ' + errorCode : ''}
+
+Please contact support:
+📞 +250 782 013 955
+📧 egurastore@gmail.com
+━━━━━━━━━━━━━━━━━━━━━━━
+            `.trim());
+          }
+        } else {
+          // Cash on delivery - no payment needed
+          setNotification({
+            type: 'success',
+            title: 'Order Placed Successfully!',
+            message: 'Pay cash when your order is delivered',
+            details: {
+              order: order.orderNumber,
+              total: order.total.toLocaleString() + ' RWF',
+              paymentMethod: 'Cash on Delivery'
+            }
+          });
+        }
+        
       } catch (backendError) {
         console.error('❌ Failed to save order to backend:', backendError);
-        console.error('❌ Error response:', backendError.response?.data);
-        console.error('❌ Error status:', backendError.response?.status);
-        
-        // Show error to user
-        alert('⚠️ Order created locally but failed to save to server. Please contact support with order: ' + order.orderNumber);
-        // Don't block order if backend save fails
+        setNotification({
+          type: 'error',
+          title: 'Order Creation Failed',
+          message: 'Unable to create your order. Please try again.',
+          details: {
+            error: backendError.response?.data?.message || backendError.message
+          },
+          support: {
+            phone: '+250 782 013 955',
+            email: 'egurastore@gmail.com'
+          }
+        });
+        setIsLoading(false);
+        setPaymentStatus('failed');
+        return;
       }
 
       // Create or update customer account
@@ -701,22 +801,33 @@ const Checkout = () => {
       // Send confirmation email (simulated)
       await sendOrderEmail(order);
 
-      // Clear cart
+      // Clear cart only after successful payment initiation
       clearCart();
       
-      // Force success status
-      setPaymentStatus('success');
+      // Set status based on payment method
+      if (paymentMethod === 'mobile_money') {
+        setPaymentStatus('pending');
+      } else {
+        setPaymentStatus('success');
+      }
       setIsLoading(false);
       
-      // Show payment modal immediately
+      // Show payment modal
       setShowPaymentModal(true);
       
     } catch (error) {
       console.error('Error creating order:', error);
-      // Even if there's an error, force success
-      setPaymentStatus('success');
+      setPaymentStatus('failed');
       setIsLoading(false);
-      setShowPaymentModal(true);
+      setNotification({
+        type: 'error',
+        title: 'Order Processing Failed',
+        message: 'An unexpected error occurred. Please try again.',
+        support: {
+          phone: '+250 782 013 955',
+          email: 'egurastore@gmail.com'
+        }
+      });
     }
   };
 
@@ -1138,7 +1249,7 @@ const Checkout = () => {
                             className="text-orange-600 focus:ring-orange-500"
                           />
                           <PhoneIcon className="w-5 h-5 ml-3 text-green-600" />
-                          <span className="ml-3 font-medium">MTN Mobile Money (MOMO)</span>
+                          <span className="ml-3 font-medium">Mobile Money (InTouch Pay)</span>
                         </label>
                         
                         <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
@@ -1162,7 +1273,7 @@ const Checkout = () => {
                           </label>
                           <input
                             type="tel"
-                            placeholder="+250 788 123 456"
+                            placeholder="250 788 940718"
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -1239,14 +1350,37 @@ const Checkout = () => {
                       {paymentMethod === 'mobile_money' && (
                         <button
                           onClick={() => {
-                            // Force success - bypass all APIs
+                            // Validate phone number
+                            if (!phoneNumber || phoneNumber.trim() === '') {
+                              setNotification({
+                                type: 'error',
+                                title: 'Phone Number Required',
+                                message: 'Please enter your phone number for Mobile Money payment'
+                              });
+                              return;
+                            }
+                            
+                            // Validate phone format (Rwanda: 250xxxxxxxxx or 07xxxxxxxx)
+                            const cleanPhone = phoneNumber.replace(/\s+/g, '');
+                            if (!/^(250|07|08)\d{8,9}$/.test(cleanPhone)) {
+                              setNotification({
+                                type: 'error',
+                                title: 'Invalid Phone Number',
+                                message: 'Please enter a valid Rwanda phone number',
+                                details: {
+                                  example: '250788940718'
+                                }
+                              });
+                              return;
+                            }
+                            
                             handlePaymentSubmit({
                               method: 'mobile_money',
-                              status: 'success',
-                              transactionId: `MOMO_${Date.now()}`
+                              status: 'pending',
+                              phone: cleanPhone
                             });
                           }}
-                          disabled={isLoading}
+                          disabled={isLoading || !phoneNumber}
                           className="w-full bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
                         >
                           {isLoading ? (
@@ -1255,7 +1389,7 @@ const Checkout = () => {
                               Processing...
                             </div>
                           ) : (
-                            'Pay with MTN Mobile Money'
+                            'Pay with Mobile Money'
                           )}
                         </button>
                       )}
@@ -1263,11 +1397,9 @@ const Checkout = () => {
                       {paymentMethod === 'cash_on_delivery' && (
                         <button
                           onClick={() => {
-                            // Force success - bypass all APIs
                             handlePaymentSubmit({
                               method: 'cash_on_delivery',
-                              status: 'success',
-                              transactionId: `COD_${Date.now()}`
+                              status: 'success'
                             });
                           }}
                           disabled={isLoading}
@@ -1385,6 +1517,128 @@ const Checkout = () => {
           </div>
         )}
       </div>
+
+      {/* Professional Notification Modal */}
+      {notification && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+          >
+            {/* Header */}
+            <div className={`p-6 ${
+              notification.type === 'success' ? 'bg-green-50' : 
+              notification.type === 'error' ? 'bg-red-50' : 'bg-blue-50'
+            }`}>
+              <div className="flex items-start justify-between">
+                <div className="flex items-start space-x-4">
+                  {notification.type === 'success' ? (
+                    <CheckCircleIcon className="h-10 w-10 text-green-600 flex-shrink-0" />
+                  ) : notification.type === 'error' ? (
+                    <ExclamationTriangleIcon className="h-10 w-10 text-red-600 flex-shrink-0" />
+                  ) : (
+                    <PhoneIcon className="h-10 w-10 text-blue-600 flex-shrink-0" />
+                  )}
+                  <div>
+                    <h3 className={`text-xl font-bold ${
+                      notification.type === 'success' ? 'text-green-900' :
+                      notification.type === 'error' ? 'text-red-900' : 'text-blue-900'
+                    }`}>
+                      {notification.title}
+                    </h3>
+                    <p className={`text-sm mt-1 ${
+                      notification.type === 'success' ? 'text-green-700' :
+                      notification.type === 'error' ? 'text-red-700' : 'text-blue-700'
+                    }`}>
+                      {notification.message}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setNotification(null);
+                    if (notification.type === 'success') {
+                      navigate('/orders');
+                    }
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Details */}
+            {notification.details && (
+              <div className="p-6 bg-gray-50 border-t border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-3">Transaction Details</h4>
+                <dl className="space-y-2">
+                  {Object.entries(notification.details).map(([key, value]) => (
+                    <div key={key} className="flex justify-between text-sm">
+                      <dt className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}:</dt>
+                      <dd className="font-medium text-gray-900">{value || 'N/A'}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
+            {/* Instructions */}
+            {notification.instructions && (
+              <div className="p-6 bg-blue-50 border-t border-blue-200">
+                <h4 className="font-semibold text-blue-900 mb-3">How to Complete Payment</h4>
+                <ol className="space-y-2">
+                  {notification.instructions.map((step, index) => (
+                    <li key={index} className="flex items-start text-sm text-blue-800">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center mr-3 text-xs font-bold">
+                        {index + 1}
+                      </span>
+                      <span className="pt-0.5">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* Support Info */}
+            {notification.support && (
+              <div className="p-6 bg-gray-100 border-t border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-2">Need Help?</h4>
+                <div className="text-sm space-y-1">
+                  <p className="text-gray-700">
+                    📞 <a href={`tel:${notification.support.phone}`} className="text-blue-600 hover:underline">{notification.support.phone}</a>
+                  </p>
+                  <p className="text-gray-700">
+                    📧 <a href={`mailto:${notification.support.email}`} className="text-blue-600 hover:underline">{notification.support.email}</a>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="p-6 bg-white border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setNotification(null);
+                  if (notification.type === 'success') {
+                    navigate('/orders');
+                  }
+                }}
+                className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
+                  notification.type === 'success' 
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : notification.type === 'error'
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {notification.type === 'success' ? 'View My Orders' : 'Close'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </>
   );
 };
