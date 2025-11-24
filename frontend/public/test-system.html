@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Test - Auth & Search</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .test-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ok { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-unknown { background: #ffc107; }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .quick-actions h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 System Test - Authentication & Search</h1>
+        
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="button-group">
+                <button onclick="testAll()">🚀 Test All Systems</button>
+                <button onclick="clearStorage()">🧹 Clear Storage</button>
+                <button onclick="location.href='/'">🏠 Go to Home</button>
+                <button onclick="location.href='/shop'">🛍️ Go to Shop</button>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <!-- Backend Health -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="backend-status"></span>
+                    Backend Health
+                </h2>
+                <button onclick="testBackendHealth()">Test Backend</button>
+                <div id="backend-result"></div>
+            </div>
+
+            <!-- Auth Check Phone -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="auth-status"></span>
+                    Auth - Check Phone
+                </h2>
+                <input type="tel" id="phone-input" placeholder="0788123456" value="0788123456">
+                <button onclick="testCheckPhone()">Test Check Phone</button>
+                <div id="auth-result"></div>
+            </div>
+
+            <!-- Search Health -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="search-status"></span>
+                    Search Health
+                </h2>
+                <button onclick="testSearchHealth()">Test Search</button>
+                <div id="search-health-result"></div>
+            </div>
+
+            <!-- Search Products -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="products-status"></span>
+                    Search Products
+                </h2>
+                <input type="text" id="search-input" placeholder="laptop" value="laptop">
+                <button onclick="testSearchProducts()">Search Products</button>
+                <div id="search-products-result"></div>
+            </div>
+
+            <!-- QuickAuth Page -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="quickauth-status"></span>
+                    QuickAuth Page
+                </h2>
+                <button onclick="testQuickAuth()">Test QuickAuth</button>
+                <button onclick="location.href='/quick-auth'">Open QuickAuth</button>
+                <div id="quickauth-result"></div>
+            </div>
+
+            <!-- Storage Info -->
+            <div class="test-card">
+                <h2>
+                    <span class="status-indicator status-unknown" id="storage-status"></span>
+                    LocalStorage
+                </h2>
+                <button onclick="checkStorage()">Check Storage</button>
+                <button onclick="clearStorage()">Clear Storage</button>
+                <div id="storage-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+
+        function showResult(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.className = `result ${type}`;
+            el.textContent = message;
+        }
+
+        function updateStatus(statusId, isOk) {
+            const el = document.getElementById(statusId);
+            el.className = `status-indicator ${isOk ? 'status-ok' : 'status-error'}`;
+        }
+
+        async function testBackendHealth() {
+            showResult('backend-result', '⏳ Testing...', 'loading');
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    updateStatus('backend-status', true);
+                    showResult('backend-result', 
+                        `✅ Backend is running!\n\nDatabase: ${data.database}\nDB Type: ${data.dbType}\nTime: ${data.timestamp}`,
+                        'success'
+                    );
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            } catch (error) {
+                updateStatus('backend-status', false);
+                showResult('backend-result', 
+                    `❌ Backend not responding!\n\nError: ${error.message}\n\nMake sure backend is running:\ncd backend && npm start`,
+                    'error'
+                );
+            }
+        }
+
+        async function testCheckPhone() {
+            const phone = document.getElementById('phone-input').value;
+            showResult('auth-result', '⏳ Testing...', 'loading');
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/check-phone?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('auth-status', true);
+                    showResult('auth-result', 
+                        `✅ Auth endpoint working!\n\nPhone: ${phone}\nExists: ${data.exists}\n\n${JSON.stringify(data, null, 2)}`,
+                        'success'
+                    );
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            } catch (error) {
+                updateStatus('auth-status', false);
+                showResult('auth-result', 
+                    `❌ Auth check failed!\n\nError: ${error.message}\n\nEndpoint: /api/auth/check-phone`,
+                    'error'
+                );
+            }
+        }
+
+        async function testSearchHealth() {
+            showResult('search-health-result', '⏳ Testing...', 'loading');
+            try {
+                const response = await fetch(`${API_BASE}/api/search/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('search-status', true);
+                    showResult('search-health-result', 
+                        `✅ Search routes working!\n\nMessage: ${data.message}\nTime: ${data.timestamp}`,
+                        'success'
+                    );
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            } catch (error) {
+                updateStatus('search-status', false);
+                showResult('search-health-result', 
+                    `❌ Search routes not working!\n\nError: ${error.message}\n\nCheck if search.js is loaded`,
+                    'error'
+                );
+            }
+        }
+
+        async function testSearchProducts() {
+            const query = document.getElementById('search-input').value;
+            showResult('search-products-result', '⏳ Searching...', 'loading');
+            try {
+                const response = await fetch(`${API_BASE}/api/search/products?query=${encodeURIComponent(query)}&limit=3`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('products-status', true);
+                    const count = data.data?.length || 0;
+                    const total = data.pagination?.total || 0;
+                    showResult('search-products-result', 
+                        `✅ Search working!\n\nQuery: "${query}"\nFound: ${total} products\nReturned: ${count} products\n\nFirst result: ${data.data?.[0]?.name || 'None'}`,
+                        'success'
+                    );
+                } else {
+                    throw new Error(data.message || 'Search failed');
+                }
+            } catch (error) {
+                updateStatus('products-status', false);
+                showResult('search-products-result', 
+                    `❌ Search failed!\n\nError: ${error.message}`,
+                    'error'
+                );
+            }
+        }
+
+        async function testQuickAuth() {
+            showResult('quickauth-result', '⏳ Testing...', 'loading');
+            try {
+                const response = await fetch('/quick-auth');
+                if (response.ok) {
+                    updateStatus('quickauth-status', true);
+                    showResult('quickauth-result', 
+                        `✅ QuickAuth page exists!\n\nStatus: ${response.status}\nClick "Open QuickAuth" to view it.`,
+                        'success'
+                    );
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('quickauth-status', false);
+                showResult('quickauth-result', 
+                    `❌ QuickAuth page not found!\n\nError: ${error.message}\n\nMake sure QuickAuth.jsx exists and route is registered.`,
+                    'error'
+                );
+            }
+        }
+
+        function checkStorage() {
+            try {
+                let total = 0;
+                let items = {};
+                
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        const size = localStorage[key].length;
+                        total += size;
+                        items[key] = (size / 1024).toFixed(2) + ' KB';
+                    }
+                }
+                
+                const totalKB = (total / 1024).toFixed(2);
+                const isOk = total < 5000000; // Less than 5MB
+                
+                updateStatus('storage-status', isOk);
+                
+                let itemList = '';
+                for (let key in items) {
+                    itemList += `\n  ${key}: ${items[key]}`;
+                }
+                
+                showResult('storage-result', 
+                    `${isOk ? '✅' : '⚠️'} Storage Status\n\nTotal: ${totalKB} KB\nItems: ${Object.keys(items).length}\n${itemList}`,
+                    isOk ? 'success' : 'info'
+                );
+            } catch (error) {
+                updateStatus('storage-status', false);
+                showResult('storage-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearStorage() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                updateStatus('storage-status', true);
+                showResult('storage-result', 
+                    '✅ Storage cleared!\n\nLocalStorage: cleared\nSessionStorage: cleared\n\nPage will reload in 2 seconds...',
+                    'success'
+                );
+                setTimeout(() => location.reload(), 2000);
+            } catch (error) {
+                showResult('storage-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAll() {
+            alert('Testing all systems... This will take a few seconds.');
+            await testBackendHealth();
+            await new Promise(r => setTimeout(r, 500));
+            await testCheckPhone();
+            await new Promise(r => setTimeout(r, 500));
+            await testSearchHealth();
+            await new Promise(r => setTimeout(r, 500));
+            await testSearchProducts();
+            await new Promise(r => setTimeout(r, 500));
+            await testQuickAuth();
+            await new Promise(r => setTimeout(r, 500));
+            checkStorage();
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testBackendHealth();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

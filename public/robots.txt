@@ -1,0 +1,57 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://sewithdebb.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /api
+Disallow: /checkout
+Disallow: /account
+
+# Allow important pages
+Allow: /shop
+Allow: /product/
+Allow: /about
+Allow: /contact
+
+# Block common bot patterns
+User-agent: *
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow Googlebot
+User-agent: Googlebot
+Allow: /
+
+# Allow Bingbot
+User-agent: Bingbot
+Allow: /
+
+# Allow social media bots
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Block aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: dotbot
+Crawl-delay: 10 

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Database - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        h1 {
+            color: #dc2626;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .warning-box {
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            color: #991b1b;
+        }
+        
+        .warning-box h3 {
+            margin-bottom: 0.5rem;
+            color: #dc2626;
+        }
+        
+        .warning-box ul {
+            text-align: left;
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .warning-box li {
+            margin: 0.5rem 0;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-item {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .success {
+            background: #10b981;
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            margin-top: 1rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .error {
+            background: #dc2626;
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            margin-top: 1rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="warning-icon">⚠️</div>
+        <h1>Clear Entire Database</h1>
+        
+        <div class="warning-box">
+            <h3>⚠️ DANGER ZONE</h3>
+            <p><strong>This action will permanently delete:</strong></p>
+            <ul>
+                <li>All orders</li>
+                <li>All customers</li>
+                <li>All products</li>
+                <li>All users</li>
+                <li>All activity logs</li>
+                <li>Everything in the database</li>
+            </ul>
+            <p><strong>This cannot be undone!</strong></p>
+        </div>
+        
+        <div class="info-box">
+            <h3>📊 Current Database Status</h3>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Orders</div>
+                    <div class="stat-value" id="ordersCount">-</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-value" id="customersCount">-</div>
+                </div>
+            </div>
+            <button class="btn-secondary" onclick="loadStats()">🔄 Refresh Stats</button>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-secondary" onclick="window.location.href='/admin'">
+                ← Back to Admin
+            </button>
+            <button class="btn-danger" onclick="confirmClear()" id="clearBtn">
+                🗑️ Clear Database
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: #667eea;">Clearing database...</p>
+        </div>
+        
+        <div class="success" id="successMessage">
+            ✅ Database cleared successfully!<br>
+            <small>All data has been permanently deleted.</small>
+        </div>
+        
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Load database stats
+        async function loadStats() {
+            try {
+                const ordersRes = await fetch(`${API_URL}/api/admin/orders/all`);
+                const ordersData = await ordersRes.json();
+                document.getElementById('ordersCount').textContent = ordersData.total || 0;
+
+                const customersRes = await fetch(`${API_URL}/api/admin/customers`);
+                const customersData = await customersRes.json();
+                document.getElementById('customersCount').textContent = customersData.total || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('ordersCount').textContent = '?';
+                document.getElementById('customersCount').textContent = '?';
+            }
+        }
+
+        // Confirm before clearing
+        function confirmClear() {
+            const confirmed = confirm(
+                '⚠️ ARE YOU ABSOLUTELY SURE?\n\n' +
+                'This will permanently delete ALL data from the database:\n' +
+                '• All orders\n' +
+                '• All customers\n' +
+                '• All products\n' +
+                '• All users\n' +
+                '• Everything!\n\n' +
+                'This action CANNOT be undone!\n\n' +
+                'Type "DELETE" in the next prompt to confirm.'
+            );
+
+            if (!confirmed) return;
+
+            const confirmation = prompt('Type DELETE to confirm:');
+            if (confirmation !== 'DELETE') {
+                alert('Cancelled. Database was not cleared.');
+                return;
+            }
+
+            clearDatabase();
+        }
+
+        // Clear database
+        async function clearDatabase() {
+            const clearBtn = document.getElementById('clearBtn');
+            const loading = document.getElementById('loading');
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+
+            // Hide messages
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            // Show loading
+            clearBtn.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/database/clear-all`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.success) {
+                    successMsg.style.display = 'block';
+                    successMsg.innerHTML = `
+                        ✅ Database cleared successfully!<br>
+                        <small>Deleted ${data.totalDeleted} documents from ${data.collections.length} collections</small>
+                    `;
+
+                    // Refresh stats
+                    setTimeout(() => {
+                        loadStats();
+                        // Also clear localStorage
+                        localStorage.clear();
+                        sessionStorage.clear();
+                    }, 1000);
+                } else {
+                    throw new Error(data.error || 'Failed to clear database');
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = `❌ Error: ${error.message}`;
+                console.error('Error clearing database:', error);
+            } finally {
+                clearBtn.disabled = false;
+            }
+        }
+
+        // Load stats on page load
+        loadStats();
+    </script>
+</body>
+</html>

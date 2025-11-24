@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Storage - SEWITHDEBBY</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        .info {
+            background: #f0f4ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #667eea;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .label {
+            font-weight: 600;
+            color: #555;
+        }
+        .value {
+            color: #667eea;
+            font-weight: bold;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0.5rem;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .success {
+            background: #10b981;
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            margin-top: 1rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🗑️</div>
+        <h1>Clear All Storage</h1>
+        <p style="color: #666; margin-bottom: 2rem;">
+            This will clear all cached data including orders, customers, and cart items.
+        </p>
+
+        <div class="info" id="storageInfo">
+            <div class="info-item">
+                <span class="label">Orders:</span>
+                <span class="value" id="ordersCount">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Admin Orders:</span>
+                <span class="value" id="adminOrdersCount">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Customers:</span>
+                <span class="value" id="customersCount">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Cart Items:</span>
+                <span class="value" id="cartCount">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Products:</span>
+                <span class="value" id="productsCount">0</span>
+            </div>
+        </div>
+
+        <button onclick="clearAllStorage()">🗑️ Clear All Data</button>
+        <button onclick="location.reload()" style="background: #6b7280;">🔄 Refresh Counts</button>
+
+        <div class="success" id="successMessage">
+            ✅ All storage cleared successfully!<br>
+            <small>Redirecting to home page...</small>
+        </div>
+    </div>
+
+    <script>
+        // Count items in storage
+        function updateCounts() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+            const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const products = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+
+            document.getElementById('ordersCount').textContent = orders.length;
+            document.getElementById('adminOrdersCount').textContent = adminOrders.length;
+            document.getElementById('customersCount').textContent = customers.length;
+            document.getElementById('cartCount').textContent = cart.length;
+            document.getElementById('productsCount').textContent = products.length;
+        }
+
+        // Clear all storage
+        function clearAllStorage() {
+            if (!confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                return;
+            }
+
+            // Clear all localStorage items
+            const itemsToClear = [
+                'orders',
+                'adminOrders',
+                'customers',
+                'cart',
+                'adminProducts',
+                'products',
+                'user',
+                'token',
+                'authToken',
+                'cartItems',
+                'recentOrders',
+                'wishlist'
+            ];
+
+            itemsToClear.forEach(item => {
+                localStorage.removeItem(item);
+            });
+
+            // Clear sessionStorage
+            sessionStorage.clear();
+
+            // Show success message
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Update counts
+            updateCounts();
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        }
+
+        // Update counts on load
+        updateCounts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "freeShippingEnabled": true,
+  "freeShippingType": "all",
+  "standardShippingFee": 2000,
+  "freeShippingThreshold": 0,
+  "selectedProducts": []
+}

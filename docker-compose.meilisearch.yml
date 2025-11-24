@@ -1,0 +1,36 @@
+# Meilisearch Docker Configuration
+# This file sets up Meilisearch with persistent data and proper configuration
+
+version: '3.8'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    container_name: meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-your-master-key-here}
+      - MEILI_ENV=${MEILI_ENV:-development}
+      - MEILI_NO_ANALYTICS=${MEILI_NO_ANALYTICS:-true}
+      - MEILI_HTTP_ADDR=${MEILI_HTTP_ADDR:-0.0.0.0:7700}
+      - MEILI_HTTP_PAYLOAD_SIZE_LIMIT=${MEILI_HTTP_PAYLOAD_SIZE_LIMIT:-104857600}
+    networks:
+      - meilisearch-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  meilisearch_data:
+    driver: local
+
+networks:
+  meilisearch-network:
+    driver: bridge
