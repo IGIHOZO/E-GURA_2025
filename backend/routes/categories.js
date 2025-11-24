@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
 const cacheResponse = require('../middleware/cacheMiddleware');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 const {
   categories,
   getMainCategories,
@@ -14,9 +17,13 @@ const {
  * Get all main categories
  * GET /api/categories
  */
+<<<<<<< HEAD
 router.get('/', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const mainCategories = getMainCategories();
     
@@ -39,9 +46,13 @@ router.get('/', cacheResponse(3600, {
  * Get all categories with subcategories
  * GET /api/categories/all
  */
+<<<<<<< HEAD
 router.get('/all', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/all', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     res.json({
       success: true,
@@ -62,9 +73,13 @@ router.get('/all', cacheResponse(3600, {
  * Get all hierarchical categories (alias for /all)
  * GET /api/categories/hierarchical/all
  */
+<<<<<<< HEAD
 router.get('/hierarchical/all', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/hierarchical/all', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     res.json({
       success: true,
@@ -85,9 +100,13 @@ router.get('/hierarchical/all', cacheResponse(3600, {
  * Get subcategories for a main category
  * GET /api/categories/:categoryId/subcategories
  */
+<<<<<<< HEAD
 router.get('/:categoryId/subcategories', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/:categoryId/subcategories', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { categoryId } = req.params;
     const subcategories = getSubcategories(categoryId);
@@ -119,9 +138,13 @@ router.get('/:categoryId/subcategories', cacheResponse(3600, {
  * Get subcategories for a main category (hierarchical route)
  * GET /api/categories/hierarchical/:categoryId/subcategories
  */
+<<<<<<< HEAD
 router.get('/hierarchical/:categoryId/subcategories', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/hierarchical/:categoryId/subcategories', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { categoryId } = req.params;
     const subcategories = getSubcategories(categoryId);
@@ -153,9 +176,13 @@ router.get('/hierarchical/:categoryId/subcategories', cacheResponse(3600, {
  * Get category by ID
  * GET /api/categories/:categoryId
  */
+<<<<<<< HEAD
 router.get('/:categoryId', cacheResponse(3600, {
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/:categoryId', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { categoryId } = req.params;
     const category = getCategoryById(categoryId);
@@ -185,10 +212,14 @@ router.get('/:categoryId', cacheResponse(3600, {
  * Search categories and subcategories
  * GET /api/categories/search?q=query
  */
+<<<<<<< HEAD
 router.get('/search/query', cacheResponse(900, {
   keyBuilder: (req) => `category-search:${(req.query.q || '').toLowerCase()}`,
   tags: ['categories', 'products:categories']
 }), (req, res) => {
+=======
+router.get('/search/query', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { q } = req.query;
     

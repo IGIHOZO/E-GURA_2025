@@ -80,8 +80,13 @@ async function enableSearchV2() {
 
     console.log('\n✅ Search V2 is now ENABLED!');
     console.log('\n📡 Test the search:');
+<<<<<<< HEAD
     console.log('   GET  https://egura.rw/api/v2/search/health');
     console.log('   POST https://egura.rw/api/v2/search');
+=======
+    console.log('   GET  http://localhost:5000/api/v2/search/health');
+    console.log('   POST http://localhost:5000/api/v2/search');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     console.log('   Body: { "query": "your search term" }');
 
     await mongoose.connection.close();

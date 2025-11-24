@@ -105,7 +105,11 @@ EXPECTED OUTPUT:
    🎉 ALL TESTS PASSED!
 
 CHECK SITEMAP:
+<<<<<<< HEAD
    Visit: https://egura.rw/api/sitemap
+=======
+   Visit: http://localhost:5000/api/sitemap
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
    Look for: <loc>https://egura.rw/blog/your-slug</loc>
 
 CHECK CONSOLE LOGS:
@@ -292,6 +296,7 @@ MONITORING & ANALYTICS
 ================================================================================
 
 CHECK BLOG POST COUNT:
+<<<<<<< HEAD
    curl https://egura.rw/api/blog/posts | jq '.count'
 
 CHECK SITEMAP BLOG COUNT:
@@ -299,6 +304,15 @@ CHECK SITEMAP BLOG COUNT:
 
 VIEW SPECIFIC POST IN SITEMAP:
    curl https://egura.rw/api/sitemap | grep "your-slug"
+=======
+   curl http://localhost:5000/api/blog/posts | jq '.count'
+
+CHECK SITEMAP BLOG COUNT:
+   curl http://localhost:5000/api/sitemap | grep -c "/blog/"
+
+VIEW SPECIFIC POST IN SITEMAP:
+   curl http://localhost:5000/api/sitemap | grep "your-slug"
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 GOOGLE SEARCH CONSOLE:
    1. Go to: https://search.google.com/search-console
@@ -408,8 +422,13 @@ CONTACT & SUPPORT
 
 Documentation: See files listed above
 Test Script: test-blog-sitemap.js
+<<<<<<< HEAD
 API Endpoint: https://egura.rw/api/sitemap
 Blog API: https://egura.rw/api/blog/posts
+=======
+API Endpoint: http://localhost:5000/api/sitemap
+Blog API: http://localhost:5000/api/blog/posts
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 ================================================================================
 STATUS: ✅ FULLY OPERATIONAL & PRODUCTION READY

@@ -1130,4 +1130,8 @@ const ProductDetail = () => {
   );
 };
 
+<<<<<<< HEAD
 export default ProductDetail; 
+=======
+export default ProductDetail; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

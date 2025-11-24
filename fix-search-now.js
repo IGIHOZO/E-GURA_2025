@@ -97,9 +97,15 @@ async function fixSearch() {
     console.log('\n✅ Search Fix Complete!\n');
     console.log('🧪 Test Search:');
     console.log('  1. Health Check:');
+<<<<<<< HEAD
     console.log('     GET https://egura.rw/api/v2/search/health\n');
     console.log('  2. Search Products:');
     console.log('     POST https://egura.rw/api/v2/search');
+=======
+    console.log('     GET http://localhost:5000/api/v2/search/health\n');
+    console.log('  2. Search Products:');
+    console.log('     POST http://localhost:5000/api/v2/search');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     console.log('     Body: { "query": "test" }\n');
     console.log('  3. Or just refresh your frontend and try searching!\n');
 

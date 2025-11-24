@@ -12,4 +12,8 @@ export const setAuthToken = (token) => {
   }
 };
 
+<<<<<<< HEAD
 export default api; 
+=======
+export default api; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

@@ -187,7 +187,11 @@ const AdminOrdersEnhanced = () => {
       await Promise.all(
         selectedOrders.map(orderId =>
           axios.put(
+<<<<<<< HEAD
             `https://egura.rw/api/admin/orders/${orderId}/status`,
+=======
+            `http://localhost:5000/api/admin/orders/${orderId}/status`,
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
             { status: newStatus },
             { headers }
           )
@@ -235,7 +239,11 @@ const AdminOrdersEnhanced = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       await axios.put(
+<<<<<<< HEAD
         `https://egura.rw/api/admin/orders/${orderId}/status`,
+=======
+        `http://localhost:5000/api/admin/orders/${orderId}/status`,
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         { status: newStatus },
         { headers }
       );

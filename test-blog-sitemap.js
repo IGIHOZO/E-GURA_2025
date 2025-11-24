@@ -5,7 +5,11 @@
 
 const axios = require('axios');
 
+<<<<<<< HEAD
 const BASE_URL = 'https://egura.rw';
+=======
+const BASE_URL = 'http://localhost:5000';
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 async function testBlogSitemapIntegration() {
   console.log('🧪 Testing Blog-to-Sitemap Integration...\n');

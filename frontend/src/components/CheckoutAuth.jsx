@@ -55,7 +55,11 @@ const CheckoutAuth = ({ onAuthComplete }) => {
 
     try {
       const formattedPhone = formatPhone(phone);
+<<<<<<< HEAD
       const response = await axios.get(`https://egura.rw/api/auth/check-phone`, {
+=======
+      const response = await axios.get(`http://localhost:5000/api/auth/check-phone`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         params: { phone: formattedPhone }
       });
 
@@ -110,7 +114,11 @@ const CheckoutAuth = ({ onAuthComplete }) => {
     setLoading(true);
     try {
       const formattedPhone = formatPhone(phone);
+<<<<<<< HEAD
       const response = await axios.get(`https://egura.rw/api/auth/check-phone`, {
+=======
+      const response = await axios.get(`http://localhost:5000/api/auth/check-phone`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         params: { phone: formattedPhone }
       });
 

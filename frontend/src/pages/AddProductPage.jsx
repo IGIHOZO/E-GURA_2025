@@ -39,7 +39,11 @@ const AddProductPage = () => {
     if (categoryId) {
       try {
         const response = await axios.get(
+<<<<<<< HEAD
           `https://egura.rw/api/categories/hierarchical/${categoryId}/subcategories`
+=======
+          `http://localhost:5000/api/categories/hierarchical/${categoryId}/subcategories`
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         );
         if (response.data.success) {
           setSubcategories(response.data.subcategories);

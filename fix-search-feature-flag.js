@@ -87,7 +87,11 @@ async function fixSearchFeatureFlags() {
     });
 
     console.log('\n✅ Search feature flags are now properly configured!');
+<<<<<<< HEAD
     console.log('You can now use Search V2 at https://egura.rw/api/v2/search');
+=======
+    console.log('You can now use Search V2 at http://localhost:5000/api/v2/search');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     
   } catch (error) {
     console.error('❌ Error:', error.message);

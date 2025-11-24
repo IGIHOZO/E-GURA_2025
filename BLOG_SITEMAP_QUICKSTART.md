@@ -44,7 +44,11 @@ Your blog is now **100% connected** to your sitemap with **automatic search engi
 ### Using API Directly
 
 ```bash
+<<<<<<< HEAD
 curl -X POST https://egura.rw/api/blog/posts \
+=======
+curl -X POST http://localhost:5000/api/blog/posts \
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   -H "Content-Type: application/json" \
   -d '{
     "title": "Best Wireless Earbuds in Kigali 2025",
@@ -63,10 +67,17 @@ curl -X POST https://egura.rw/api/blog/posts \
 ### Method 1: Check Sitemap
 ```bash
 # View sitemap
+<<<<<<< HEAD
 curl https://egura.rw/api/sitemap
 
 # Count blog posts
 curl https://egura.rw/api/sitemap | grep "/blog/" -c
+=======
+curl http://localhost:5000/api/sitemap
+
+# Count blog posts
+curl http://localhost:5000/api/sitemap | grep "/blog/" -c
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ### Method 2: Check Server Console

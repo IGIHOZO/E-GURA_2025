@@ -4,12 +4,18 @@ const { Product } = require('../models');
 const { optionalAuthMiddleware } = require('../middleware/authMiddleware');
 const RawProductModel = require('../models-postgres/Product'); // Import raw Sequelize model directly
 const { Op } = require('sequelize');
+<<<<<<< HEAD
 const cacheResponse = require('../middleware/cacheMiddleware');
 
 // Get featured products (must come before /:id route)
 router.get('/featured', cacheResponse(300, {
   tags: ['products', 'products:featured', 'products:list']
 }), async (req, res) => {
+=======
+
+// Get featured products (must come before /:id route)
+router.get('/featured', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const products = await Product.findAll({
       where: {
@@ -30,9 +36,13 @@ router.get('/featured', cacheResponse(300, {
 });
 
 // Get new arrivals (must come before /:id route)
+<<<<<<< HEAD
 router.get('/new-arrivals', cacheResponse(300, {
   tags: ['products', 'products:new-arrivals', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/new-arrivals', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const products = await Product.findAll({
       where: {
@@ -54,9 +64,13 @@ router.get('/new-arrivals', cacheResponse(300, {
 });
 
 // Get sale products (must come before /:id route)
+<<<<<<< HEAD
 router.get('/sale', cacheResponse(300, {
   tags: ['products', 'products:sale', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/sale', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const products = await Product.findAll({
       where: {
@@ -77,10 +91,14 @@ router.get('/sale', cacheResponse(300, {
 });
 
 // Get flash deals - products with high discount and limited time (must come before /:id route)
+<<<<<<< HEAD
 router.get('/flash-deals', cacheResponse(120, {
   keyBuilder: (req) => `flash-deals:${req.query.limit || 10}`,
   tags: ['products', 'products:flash', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/flash-deals', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const limit = parseInt(req.query.limit) || 10;
     
@@ -112,10 +130,14 @@ router.get('/flash-deals', cacheResponse(120, {
 });
 
 // Get trending products - based on views, orders, and recent activity (must come before /:id route)
+<<<<<<< HEAD
 router.get('/trending', cacheResponse(120, {
   keyBuilder: (req) => `trending:${req.query.limit || 10}`,
   tags: ['products', 'products:trending', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/trending', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const limit = parseInt(req.query.limit) || 10;
     
@@ -143,10 +165,14 @@ router.get('/trending', cacheResponse(120, {
 });
 
 // Get best deals - combination of good price, high rating, and value (must come before /:id route)
+<<<<<<< HEAD
 router.get('/best-deals', cacheResponse(120, {
   keyBuilder: (req) => `best-deals:${req.query.limit || 10}`,
   tags: ['products', 'products:best-deals', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/best-deals', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const limit = parseInt(req.query.limit) || 10;
     
@@ -174,9 +200,13 @@ router.get('/best-deals', cacheResponse(120, {
 });
 
 // Get product categories (must come before /:id route)
+<<<<<<< HEAD
 router.get('/categories', cacheResponse(1800, {
   tags: ['products', 'products:categories', 'categories']
 }), async (req, res) => {
+=======
+router.get('/categories', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const categories = await Product.distinct('category');
     const subcategories = await Product.distinct('subcategory');
@@ -197,9 +227,13 @@ router.get('/categories', cacheResponse(1800, {
 });
 
 // Search products (must come before /:id route)
+<<<<<<< HEAD
 router.get('/search', cacheResponse(90, {
   tags: ['products', 'products:search', 'search']
 }), async (req, res) => {
+=======
+router.get('/search', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { q, category, priceRange, limit = 10 } = req.query;
     
@@ -238,10 +272,14 @@ router.get('/search', cacheResponse(90, {
 });
 
 // Get all products with filtering and pagination
+<<<<<<< HEAD
 router.get('/', optionalAuthMiddleware, cacheResponse(60, {
   skip: (req) => !!req.user, // personalized data shouldn't be cached
   tags: ['products', 'products:list']
 }), async (req, res) => {
+=======
+router.get('/', optionalAuthMiddleware, async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
 const {
       page = 1,
@@ -364,6 +402,7 @@ const {
 });
 
 // Test endpoint to debug ID parameter
+<<<<<<< HEAD
 // Aggregated home page feed
 router.get('/home-feed', cacheResponse(120, {
   keyBuilder: (req) => {
@@ -446,6 +485,9 @@ router.get('/home-feed', cacheResponse(120, {
 router.get('/test/:id', cacheResponse(60, {
   tags: ['products', 'products:test']
 }), async (req, res) => {
+=======
+router.get('/test/:id', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   res.json({
     idFromParams: req.params.id,
     typeOfId: typeof req.params.id,
@@ -454,10 +496,14 @@ router.get('/test/:id', cacheResponse(60, {
 });
 
 // Get product by ID (must come last)
+<<<<<<< HEAD
 router.get('/:id', cacheResponse(300, {
   keyBuilder: (req) => `product:${req.params.id}`,
   tags: ['products', 'products:detail']
 }), async (req, res) => {
+=======
+router.get('/:id', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const productId = req.params.id; // Use different variable name
     console.log('========================================');

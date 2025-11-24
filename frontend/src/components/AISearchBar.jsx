@@ -54,7 +54,11 @@ const AISearchBar = ({ onSearch, onFilterChange, showFilters = true }) => {
     }
 
     try {
+<<<<<<< HEAD
       const response = await axios.get(`https://egura.rw/api/search/suggestions?q=${searchQuery}`);
+=======
+      const response = await axios.get(`http://localhost:5000/api/search/suggestions?q=${searchQuery}`);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       setSuggestions(response.data.suggestions || []);
     } catch (error) {
       console.error('Failed to fetch suggestions:', error);

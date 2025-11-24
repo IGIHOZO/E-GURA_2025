@@ -45,13 +45,18 @@ Timestamp: October 19, 2025, 7:56 PM
 ✅ Database Status: CONNECTED
 ✅ Auto-reconnect: ENABLED
 ✅ Heartbeat Monitoring: ACTIVE
+<<<<<<< HEAD
 ✅ API Endpoint: https://egura.rw
+=======
+✅ API Endpoint: http://localhost:5000
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 ================================================================================
 🧪 VERIFIED WORKING ENDPOINTS:
 ================================================================================
 
 ✅ Health Check:
+<<<<<<< HEAD
    https://egura.rw/api/health
    Response: {"status":"ok","database":"connected","dbType":"PostgreSQL"}
 
@@ -61,6 +66,17 @@ Timestamp: October 19, 2025, 7:56 PM
 
 ✅ Analytics API:
    https://egura.rw/api/analytics/track
+=======
+   http://localhost:5000/api/health
+   Response: {"status":"ok","database":"connected","dbType":"PostgreSQL"}
+
+✅ Products API:
+   http://localhost:5000/api/products?limit=5
+   Response: 5 products returned successfully
+
+✅ Analytics API:
+   http://localhost:5000/api/analytics/track
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
    Status: WORKING (no more 500 errors)
 
 ================================================================================
@@ -192,10 +208,17 @@ YOUR E-GURA E-COMMERCE PLATFORM IS NOW FULLY OPERATIONAL!
 ================================================================================
 
 Check server health:
+<<<<<<< HEAD
    curl https://egura.rw/api/health
 
 Get products:
    curl https://egura.rw/api/products?limit=5
+=======
+   curl http://localhost:5000/api/health
+
+Get products:
+   curl http://localhost:5000/api/products?limit=5
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 Restart backend:
    cd backend
@@ -211,11 +234,19 @@ Kill process on port 5000:
 🔗 IMPORTANT URLS:
 ================================================================================
 
+<<<<<<< HEAD
 Backend API: https://egura.rw
 Frontend: http://localhost:4000
 Admin Login: http://localhost:4000/admin-login
 API Health: https://egura.rw/api/health
 API Products: https://egura.rw/api/products
+=======
+Backend API: http://localhost:5000
+Frontend: http://localhost:4000
+Admin Login: http://localhost:4000/admin-login
+API Health: http://localhost:5000/api/health
+API Products: http://localhost:5000/api/products
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 ================================================================================
 ✅ VERIFIED & TESTED - 100% WORKING!

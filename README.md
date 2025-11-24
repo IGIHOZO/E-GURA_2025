@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # E-Gura Store
 
 Rwanda's Premier Online Shopping Platform
@@ -79,3 +80,6 @@ See [PERFORMANCE_TEST_REPORT.md](./PERFORMANCE_TEST_REPORT.md) for detailed metr
 ## 📝 License
 
 Copyright © 2025 E-Gura Store. All rights reserved.
+=======
+"# E-GURA_2025" 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

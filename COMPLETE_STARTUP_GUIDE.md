@@ -34,7 +34,11 @@ npm run dev
 
 ### Step 2: Verify Backend is Running
 
+<<<<<<< HEAD
 Visit: https://egura.rw/api/health
+=======
+Visit: http://localhost:5000/api/health
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 **Should show:**
 ```json
@@ -139,12 +143,20 @@ npm run dev
 
 **Check 1:** Is backend running?
 ```bash
+<<<<<<< HEAD
 curl https://egura.rw/api/health
+=======
+curl http://localhost:5000/api/health
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 **Check 2:** Are there products in database?
 ```bash
+<<<<<<< HEAD
 curl https://egura.rw/api/products?limit=10
+=======
+curl http://localhost:5000/api/products?limit=10
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 **Check 3:** Check browser console for errors
@@ -229,17 +241,29 @@ Once backend is running:
 
 ### 1. Backend Health Check
 ```bash
+<<<<<<< HEAD
 curl https://egura.rw/api/health
+=======
+curl http://localhost:5000/api/health
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ### 2. Get Products
 ```bash
+<<<<<<< HEAD
 curl https://egura.rw/api/products?limit=5
+=======
+curl http://localhost:5000/api/products?limit=5
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ### 3. Analytics Test
 ```bash
+<<<<<<< HEAD
 curl -X POST https://egura.rw/api/analytics/track \
+=======
+curl -X POST http://localhost:5000/api/analytics/track \
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   -H "Content-Type: application/json" \
   -d '{"event_name":"test","event_data":{}}'
 ```
@@ -342,7 +366,11 @@ Before reporting issues:
 - [ ] PostgreSQL is running
 - [ ] Backend shows "All systems operational!"
 - [ ] Frontend shows local server URL
+<<<<<<< HEAD
 - [ ] https://egura.rw/api/health returns OK
+=======
+- [ ] http://localhost:5000/api/health returns OK
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 - [ ] Browser console shows no ERR_CONNECTION_REFUSED
 - [ ] Hard refreshed browser (Ctrl+F5)
 

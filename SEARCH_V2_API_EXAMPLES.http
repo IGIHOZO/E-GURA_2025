@@ -3,7 +3,11 @@
 # Use with REST Client extension in VS Code or import to Postman
 ###
 
+<<<<<<< HEAD
 @baseUrl = https://egura.rw/api/v2/search
+=======
+@baseUrl = http://localhost:5000/api/v2/search
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 @deviceId = device_test_123
 @userId = user_test_456
 

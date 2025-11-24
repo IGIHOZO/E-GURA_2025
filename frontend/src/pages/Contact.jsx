@@ -13,4 +13,8 @@ const Contact = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Contact; 
+=======
+export default Contact; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

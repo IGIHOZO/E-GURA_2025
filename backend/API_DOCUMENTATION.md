@@ -5,7 +5,11 @@ SEWITHDEBBY is a comprehensive ecommerce platform for African fashion, specifica
 
 ## Base URL
 ```
+<<<<<<< HEAD
 https://egura.rw/api
+=======
+http://localhost:5000/api
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ## Authentication
@@ -370,6 +374,25 @@ POST /ai/recommendations
 }
 ```
 
+<<<<<<< HEAD
+=======
+### Virtual Try-On
+```http
+POST /ai/virtual-tryon
+```
+**Body:**
+```json
+{
+  "productId": "64f8a1b2c3d4e5f6a7b8c9d0",
+  "userImage": "data:image/jpeg;base64,...",
+  "bodyType": "hourglass",
+  "skinTone": "medium",
+  "preferences": {
+    "style": "modern",
+    "occasion": "wedding"
+  }
+}
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ### Style Analysis
@@ -568,7 +591,11 @@ Successful responses follow this format:
 - [x] Cash on delivery processing
 - [x] Comprehensive order management
 - [x] User profile and address management
+<<<<<<< HEAD
 - [x] AI-powered recommendations
+=======
+- [x] AI-powered recommendations and virtual try-on
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 - [x] Kigali-specific fashion trends
 - [x] Smart search with location context
 - [x] Size recommendation system

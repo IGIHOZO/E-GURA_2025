@@ -146,7 +146,11 @@ const ShopNew = () => {
 
       // Load personalized recommendations for THIS device
       const deviceId = getDeviceId();
+<<<<<<< HEAD
       const recoResponse = await axios.get(`https://egura.rw/api/intelligent-search/recommendations/${deviceId}`, {
+=======
+      const recoResponse = await axios.get(`http://localhost:5000/api/intelligent-search/recommendations/${deviceId}`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         params: { limit: 8 }
       });
 

@@ -107,7 +107,11 @@ const SMSLogin = () => {
         
         try {
           // Check if user exists in database via API
+<<<<<<< HEAD
           const response = await fetch(`https://egura.rw/api/auth/check-phone`, {
+=======
+          const response = await fetch(`http://localhost:5000/api/auth/check-phone`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone: formattedPhone })

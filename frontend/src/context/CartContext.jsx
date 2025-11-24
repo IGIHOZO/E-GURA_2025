@@ -218,4 +218,8 @@ export const useCart = () => {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
+<<<<<<< HEAD
 }; 
+=======
+}; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

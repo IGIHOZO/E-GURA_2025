@@ -37,7 +37,11 @@
             result.innerHTML = '<p>Testing...</p>';
             
             try {
+<<<<<<< HEAD
                 const response = await fetch('https://egura.rw/api/health');
+=======
+                const response = await fetch('http://localhost:5000/api/health');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
                 const data = await response.json();
                 result.innerHTML = `<p class="success">✅ Backend Connected</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
             } catch (error) {
@@ -50,7 +54,11 @@
             result.innerHTML = '<p>Testing...</p>';
             
             try {
+<<<<<<< HEAD
                 const response = await fetch('https://egura.rw/api/admin/products?limit=3');
+=======
+                const response = await fetch('http://localhost:5000/api/products?limit=3');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
                 const data = await response.json();
                 
                 if (data.success && data.data && data.data.length > 0) {

@@ -195,7 +195,11 @@ const AdvancedAdminDashboard = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
+<<<<<<< HEAD
       await axios.put(`https://egura.rw/api/admin/orders/${orderId}/status`, {
+=======
+      await axios.put(`http://localhost:5000/api/admin/orders/${orderId}/status`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         status: newStatus
       });
       

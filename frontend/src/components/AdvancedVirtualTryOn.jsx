@@ -452,4 +452,8 @@ const AdvancedVirtualTryOn = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AdvancedVirtualTryOn; 
+=======
+export default AdvancedVirtualTryOn; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

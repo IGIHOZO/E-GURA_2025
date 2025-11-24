@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {
   getAIRecommendations,
+<<<<<<< HEAD
+=======
+  virtualTryOn,
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   ladiVtonTryOn,
   analyzeStyle,
   getKigaliTrends,
@@ -75,6 +79,18 @@ router.post('/recommendations', trackAIActivity, async (req, res, next) => {
   next();
 }, getAIRecommendations);
 
+<<<<<<< HEAD
+=======
+router.post('/virtual-tryon', trackAIActivity, async (req, res, next) => {
+  req.customerPhone = req.body.phone || req.body.customerPhone;
+  req.aiActivityType = 'virtual_tryon_used';
+  req.aiActivityDetails = { 
+    type: 'virtual_tryon',
+    productId: req.body.productId 
+  };
+  next();
+}, virtualTryOn);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 router.post('/ladi-vton', trackAIActivity, async (req, res, next) => {
   req.customerPhone = req.body.phone || req.body.customerPhone;

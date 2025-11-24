@@ -421,6 +421,27 @@ const generateLocationBasedRecommendations = async (location, preferences) => {
   }));
 };
 
+<<<<<<< HEAD
+=======
+const generateVirtualTryOn = async (productId, userImage, bodyType, skinTone) => {
+  // Mock virtual try-on - in real app, this would use computer vision AI
+  return {
+    image: `https://api.sewithdebby.com/tryon/${productId}_${Date.now()}.jpg`,
+    confidence: 0.85,
+    recommendations: [
+      'This dress complements your skin tone perfectly',
+      'Consider pairing with gold accessories',
+      'Perfect for Kigali weather and occasions'
+    ],
+    fitAnalysis: {
+      fit: 'Excellent',
+      comfort: 'High',
+      styleMatch: 'Perfect',
+      occasionSuitability: 'Wedding, Party, Church'
+    }
+  };
+};
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 const generateStyleAnalysis = async (userImage, preferences, occasion, location) => {
   // Mock style analysis

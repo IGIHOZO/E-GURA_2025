@@ -1,6 +1,9 @@
 // BRAND NEW PRODUCT CREATION - CLEAN, SIMPLE, NO BUGS
 const { Product } = require('../models');
+<<<<<<< HEAD
 const { invalidateProductData } = require('../services/cacheInvalidation');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 const createProductSimple = async (req, res) => {
   try {
@@ -95,8 +98,11 @@ const createProductSimple = async (req, res) => {
     console.log('✅ Product created successfully!');
     console.log('ID:', product.id);
     console.log('Slug:', product.slug);
+<<<<<<< HEAD
 
     await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     
     // Return success
     res.status(201).json({

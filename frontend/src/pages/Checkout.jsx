@@ -51,7 +51,11 @@ const Checkout = () => {
     
     // Fetch full user data with addresses from backend
     try {
+<<<<<<< HEAD
       const response = await axios.get(`https://egura.rw/api/auth/check-phone`, {
+=======
+      const response = await axios.get(`http://localhost:5000/api/auth/check-phone`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         params: { phone: userData.phone }
       });
       
@@ -190,7 +194,11 @@ const Checkout = () => {
   useEffect(() => {
     const calculateShipping = async () => {
       if (cartTotal === 0 || !Array.isArray(cart) || cart.length === 0) {
+<<<<<<< HEAD
         setShippingCost(2000);
+=======
+        setShippingCost(0);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         return;
       }
 
@@ -215,7 +223,11 @@ const Checkout = () => {
       } catch (error) {
         console.error('Error calculating shipping:', error);
         // Fallback to default shipping cost
+<<<<<<< HEAD
         setShippingCost(0);
+=======
+        setShippingCost(2000);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       }
     };
 

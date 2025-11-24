@@ -38,11 +38,19 @@ STEP 3: Test Admin Login
 ================================================================================
 
 Test 1: Backend Health
+<<<<<<< HEAD
    Visit: https://egura.rw/api/health
    Should show: {"status":"ok","database":"connected"}
 
 Test 2: Get Products
    Visit: https://egura.rw/api/products?limit=5
+=======
+   Visit: http://localhost:5000/api/health
+   Should show: {"status":"ok","database":"connected"}
+
+Test 2: Get Products
+   Visit: http://localhost:5000/api/products?limit=5
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
    Should show: Product list in JSON
 
 Test 3: Homepage

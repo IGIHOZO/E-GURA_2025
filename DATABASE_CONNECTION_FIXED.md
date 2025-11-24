@@ -315,7 +315,11 @@ pool: {
 
 ```bash
 # Check health endpoint
+<<<<<<< HEAD
 curl https://egura.rw/api/health
+=======
+curl http://localhost:5000/api/health
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 **Response:**

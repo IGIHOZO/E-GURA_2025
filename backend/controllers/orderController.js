@@ -55,7 +55,11 @@ const createMomoPayment = async (order, phone) => {
       mobilephoneno: phone, // Note: API expects 'mobilephoneno' not 'mobilephone'
       requesttransactionid: requestTransactionId,
       accountno: accountno,
+<<<<<<< HEAD
       callbackurl: `${process.env.BASE_URL || 'https://egura.rw'}/api/payments/callback/${requestTransactionId}`
+=======
+      callbackurl: `${process.env.BASE_URL || 'http://localhost:5000'}/api/payments/callback/${requestTransactionId}`
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     };
 
     console.log('InTouch Pay Request (API compliant):', paymentRequest);

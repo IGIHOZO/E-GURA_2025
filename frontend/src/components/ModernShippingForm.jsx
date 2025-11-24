@@ -525,4 +525,8 @@ const ModernShippingForm = ({
   );
 };
 
+<<<<<<< HEAD
 export default ModernShippingForm; 
+=======
+export default ModernShippingForm; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

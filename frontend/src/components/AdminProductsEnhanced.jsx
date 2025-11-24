@@ -97,7 +97,11 @@ const AdminProductsEnhanced = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const res = await axios.put(
+<<<<<<< HEAD
         `https://egura.rw/api/admin/products/${editingProduct.id}`,
+=======
+        `http://localhost:5000/api/admin/products/${editingProduct.id}`,
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         editingProduct,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -126,7 +130,11 @@ const AdminProductsEnhanced = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
+<<<<<<< HEAD
       await axios.delete(`https://egura.rw/api/admin/products/${productId}`, {
+=======
+      await axios.delete(`http://localhost:5000/api/admin/products/${productId}`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         headers: { Authorization: `Bearer ${token}` }
       });
       await fetchProducts();

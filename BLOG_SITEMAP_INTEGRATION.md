@@ -122,7 +122,11 @@ Each blog post includes:
 ### Method 2: Direct API Call
 
 ```bash
+<<<<<<< HEAD
 curl -X POST https://egura.rw/api/blog/posts \
+=======
+curl -X POST http://localhost:5000/api/blog/posts \
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   -H "Content-Type: application/json" \
   -d '{
     "title": "Your Blog Title",
@@ -159,7 +163,11 @@ You can create a blog management UI that calls the API.
 
 ### 1. Check Sitemap Includes Your Blog
 
+<<<<<<< HEAD
 Visit: `https://egura.rw/api/sitemap`
+=======
+Visit: `http://localhost:5000/api/sitemap`
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 Look for:
 ```xml
@@ -190,10 +198,17 @@ When you create a blog post, you should see:
 
 ```bash
 # Get sitemap
+<<<<<<< HEAD
 curl https://egura.rw/api/sitemap
 
 # Count blog posts in sitemap
 curl https://egura.rw/api/sitemap | grep -c "<loc>https://egura.rw/blog/"
+=======
+curl http://localhost:5000/api/sitemap
+
+# Count blog posts in sitemap
+curl http://localhost:5000/api/sitemap | grep -c "<loc>https://egura.rw/blog/"
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ---
@@ -339,10 +354,17 @@ Each blog post has:
 
 ```bash
 # Get all blog posts
+<<<<<<< HEAD
 curl https://egura.rw/api/blog/posts
 
 # Get sitemap stats
 curl https://egura.rw/api/sitemap | grep "Blog Posts" -A 20
+=======
+curl http://localhost:5000/api/blog/posts
+
+# Get sitemap stats
+curl http://localhost:5000/api/sitemap | grep "Blog Posts" -A 20
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ```
 
 ### View in Google Search Console

@@ -23,7 +23,11 @@ const BlogPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+<<<<<<< HEAD
         const response = await axios.get(`https://egura.rw/api/blog/posts/${id}`);
+=======
+        const response = await axios.get(`http://localhost:5000/api/blog/posts/${id}`);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         if (response.data.success) {
           setPost(response.data.post);
         }

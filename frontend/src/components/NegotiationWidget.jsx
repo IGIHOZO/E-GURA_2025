@@ -83,7 +83,11 @@ const NegotiationWidget = ({
 
   const messagesEndRef = useRef(null);
   const dwellTimerRef = useRef(null);
+<<<<<<< HEAD
   const API_URL = import.meta.env.VITE_API_URL || '';
+=======
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
   const t = translations[language];
 

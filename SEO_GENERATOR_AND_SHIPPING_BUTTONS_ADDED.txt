@@ -549,7 +549,11 @@ ACCESS INFORMATION
 - URL: http://localhost:4000/admin/seo-generator
 
 **API Endpoint:**
+<<<<<<< HEAD
 - POST https://egura.rw/api/seo/generate
+=======
+- POST http://localhost:5000/api/seo/generate
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 - Body: { "topic": "product-daily" }
 
 **Shipping Settings:**

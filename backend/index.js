@@ -3,12 +3,16 @@ const { sequelize, testConnection, startHeartbeat, stopHeartbeat, autoReconnect 
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+<<<<<<< HEAD
 const compression = require('compression');
 const helmet = require('helmet');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 dotenv.config();
 
 const app = express();
+<<<<<<< HEAD
 app.disable('x-powered-by');
 app.set('etag', 'strong');
 
@@ -18,6 +22,10 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 app.use(compression());
+=======
+
+// Middleware
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -72,7 +80,10 @@ const blogRoutes = require('./routes/blog');
 const sitemapRoutes = require('./routes/sitemap');
 const mediaUploadRoutes = require('./routes/mediaUpload');
 const analyticsRoutes = require('./routes/analytics');
+<<<<<<< HEAD
 const momoCodesRoutes = require('./routes/momoCodes');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -107,7 +118,10 @@ app.use('/api/media', mediaUploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressesRoutes);
+<<<<<<< HEAD
 app.use('/api/momo-codes', momoCodesRoutes);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 const PORT = process.env.PORT || 5000;
 

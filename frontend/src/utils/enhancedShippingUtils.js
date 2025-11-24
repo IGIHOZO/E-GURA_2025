@@ -286,4 +286,8 @@ export const createEnhancedShippingAddressData = (form, customerId) => {
 };
 
 // Export the base validation function for backward compatibility
+<<<<<<< HEAD
 export const validateShippingForm = baseValidateForm; 
+=======
+export const validateShippingForm = baseValidateForm; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

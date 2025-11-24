@@ -1,6 +1,9 @@
 const { Product, Order, User } = require('../models');
 const seoGenerator = require('../services/seoGenerator');
+<<<<<<< HEAD
 const { invalidateProductData } = require('../services/cacheInvalidation');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 // Handle Payment model separately as it might not be in the adapter
 let Payment;
@@ -224,8 +227,11 @@ const createProduct = async (req, res) => {
 
     console.log('✅ Product created successfully:', product.id);
 
+<<<<<<< HEAD
     await invalidateProductData(product.id || product._id);
 
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     res.status(201).json({
       success: true,
       data: product,
@@ -292,7 +298,10 @@ const updateProduct = async (req, res) => {
       }
 
       await product.update(updateData);
+<<<<<<< HEAD
       await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
       res.json({
         success: true,
@@ -307,8 +316,11 @@ const updateProduct = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Product not found' });
       }
 
+<<<<<<< HEAD
       await invalidateProductData(product.id || product._id);
 
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       res.json({
         success: true,
         data: product,
@@ -337,7 +349,10 @@ const deleteProduct = async (req, res) => {
       }
 
       await product.destroy();
+<<<<<<< HEAD
       await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
       res.json({
         success: true,
@@ -351,8 +366,11 @@ const deleteProduct = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Product not found' });
       }
 
+<<<<<<< HEAD
       await invalidateProductData(product.id || product._id);
 
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       res.json({
         success: true,
         message: 'Product deleted successfully'

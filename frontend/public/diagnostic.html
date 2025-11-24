@@ -126,7 +126,11 @@
             result.innerHTML = '<div class="info">Testing... <span class="spinner"></span></div>';
             
             try {
+<<<<<<< HEAD
                 const response = await fetch('https://egura.rw/api/health');
+=======
+                const response = await fetch('http://localhost:5000/api/health');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
                 const data = await response.json();
                 
                 if (data.status === 'ok') {
@@ -154,7 +158,11 @@
             result.innerHTML = '<div class="info">Testing... <span class="spinner"></span></div>';
             
             try {
+<<<<<<< HEAD
                 const response = await fetch('https://egura.rw/api/products?limit=3');
+=======
+                const response = await fetch('http://localhost:5000/api/products?limit=3');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
                 const data = await response.json();
                 
                 if (data.success && data.data && data.data.length > 0) {

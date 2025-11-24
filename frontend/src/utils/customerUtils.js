@@ -263,4 +263,8 @@ export const testPhoneValidation = () => {
     console.log(`${phone}: ${errors.phoneNumber ? 'INVALID' : 'VALID'}`);
   });
   console.log('=== End Test ===');
+<<<<<<< HEAD
 }; 
+=======
+}; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

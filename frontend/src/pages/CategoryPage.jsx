@@ -65,7 +65,11 @@ const CategoryPage = () => {
     setLoading(true);
     try {
       // Fetch category details
+<<<<<<< HEAD
       const categoryResponse = await axios.get(`https://egura.rw/api/categories/${slug}`);
+=======
+      const categoryResponse = await axios.get(`http://localhost:5000/api/categories/${slug}`);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       
       if (categoryResponse.data.success && categoryResponse.data.category) {
         const categoryData = categoryResponse.data.category;

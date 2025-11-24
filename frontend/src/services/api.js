@@ -128,4 +128,8 @@ export const customerAPI = {
   updateStatus: (id, data) => api.put(`/admin/customers/${id}/status`, data),
 };
 
+<<<<<<< HEAD
 export default api; 
+=======
+export default api; 
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742

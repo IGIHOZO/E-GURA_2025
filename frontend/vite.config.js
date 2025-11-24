@@ -118,7 +118,11 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
+<<<<<<< HEAD
         target: 'https://egura.rw',
+=======
+        target: 'http://localhost:5000',
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         changeOrigin: true,
         secure: false,
         ws: true,
@@ -154,7 +158,11 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
+<<<<<<< HEAD
         target: 'https://egura.rw',
+=======
+        target: 'http://localhost:5000',
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         changeOrigin: true
       }
     },

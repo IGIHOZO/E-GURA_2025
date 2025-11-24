@@ -193,7 +193,11 @@ const AdminDashboardNew = () => {
           Math.round(((parseFloat(productForm.originalPrice) - parseFloat(productForm.price)) / parseFloat(productForm.originalPrice)) * 100) : 0
       };
       
+<<<<<<< HEAD
       const response = await axios.put(`https://egura.rw/api/admin/products/${editingProduct._id}`, productData);
+=======
+      const response = await axios.put(`http://localhost:5000/api/admin/products/${editingProduct._id}`, productData);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       
       if (response.data.success) {
         alert('✅ Product updated successfully!');
@@ -213,7 +217,11 @@ const AdminDashboardNew = () => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     
     try {
+<<<<<<< HEAD
       const response = await axios.delete(`https://egura.rw/api/admin/products/${productId}`);
+=======
+      const response = await axios.delete(`http://localhost:5000/api/admin/products/${productId}`);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       
       if (response.data.success) {
         alert('✅ Product deleted successfully!');

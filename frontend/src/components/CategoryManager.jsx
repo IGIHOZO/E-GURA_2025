@@ -49,7 +49,11 @@ const CategoryManager = ({ onCategoriesUpdate }) => {
     try {
       if (editingCategory) {
         // Update
+<<<<<<< HEAD
         await axios.put(`https://egura.rw/api/categories/admin/${editingCategory._id}`, formData);
+=======
+        await axios.put(`http://localhost:5000/api/categories/admin/${editingCategory._id}`, formData);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         alert('✅ Category updated successfully!');
       } else {
         // Create
@@ -87,7 +91,11 @@ const CategoryManager = ({ onCategoriesUpdate }) => {
     }
 
     try {
+<<<<<<< HEAD
       await axios.delete(`https://egura.rw/api/categories/admin/${category._id}`);
+=======
+      await axios.delete(`http://localhost:5000/api/categories/admin/${category._id}`);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       alert('✅ Category deleted successfully!');
       loadCategories();
     } catch (error) {

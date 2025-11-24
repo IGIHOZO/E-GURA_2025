@@ -10,7 +10,11 @@ async function testCustomerAPI() {
   try {
     // Test 1: Get orders by phone
     console.log('Test 1: Fetching orders for phone:', testPhone);
+<<<<<<< HEAD
     const response1 = await axios.post('https://egura.rw/api/orders/customer-orders', {
+=======
+    const response1 = await axios.post('http://localhost:5000/api/orders/customer-orders', {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       phone: testPhone
     });
     console.log('✅ Response:', response1.data);
@@ -18,7 +22,11 @@ async function testCustomerAPI() {
     
     // Test 2: Get orders by alternative phone format
     console.log('\nTest 2: Fetching orders for phone:', testPhone2);
+<<<<<<< HEAD
     const response2 = await axios.post('https://egura.rw/api/orders/customer-orders', {
+=======
+    const response2 = await axios.post('http://localhost:5000/api/orders/customer-orders', {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       phone: testPhone2
     });
     console.log('✅ Response:', response2.data);
@@ -26,7 +34,11 @@ async function testCustomerAPI() {
     
     // Test 3: Get customer stats
     console.log('\nTest 3: Fetching customer stats');
+<<<<<<< HEAD
     const response3 = await axios.post('https://egura.rw/api/orders/customer-stats', {
+=======
+    const response3 = await axios.post('http://localhost:5000/api/orders/customer-stats', {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
       phone: testPhone
     });
     console.log('✅ Stats:', response3.data.stats);

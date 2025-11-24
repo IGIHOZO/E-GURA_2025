@@ -74,7 +74,11 @@ const AdminAdvancedDashboard = () => {
       setSeoData(response.data);
       
       // Update product with SEO
+<<<<<<< HEAD
       await axios.put(`https://egura.rw/api/admin/products/${product._id}`, {
+=======
+      await axios.put(`http://localhost:5000/api/admin/products/${product._id}`, {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         seoTitle: response.data.title,
         seoDescription: response.data.description,
         seoKeywords: response.data.keywords,

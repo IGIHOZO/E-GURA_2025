@@ -102,7 +102,11 @@ METHOD 2: Direct API Call
   const formData = new FormData();
   formData.append('media', fileInput.files[0]);
   
+<<<<<<< HEAD
   fetch('https://egura.rw/api/media/upload/single', {
+=======
+  fetch('http://localhost:5000/api/media/upload/single', {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     method: 'POST',
     body: formData
   })

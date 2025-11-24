@@ -11,7 +11,10 @@ const Customer = require('./Customer');
 const Review = require('./Review');
 const Wishlist = require('./Wishlist');
 const Address = require('./Address');
+<<<<<<< HEAD
 const MomoCode = require('./MomoCode');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 // Define relationships
 Order.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -38,7 +41,10 @@ const wrappedCustomer = wrapModel(Customer);
 const wrappedReview = wrapModel(Review);
 const wrappedWishlist = wrapModel(Wishlist);
 const wrappedAddress = wrapModel(Address);
+<<<<<<< HEAD
 const wrappedMomoCode = wrapModel(MomoCode);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 module.exports = {
   Product: wrappedProduct,
@@ -48,6 +54,10 @@ module.exports = {
   Customer: wrappedCustomer,
   Review: wrappedReview,
   Wishlist: wrappedWishlist,
+<<<<<<< HEAD
   Address: wrappedAddress,
   MomoCode: wrappedMomoCode
+=======
+  Address: wrappedAddress
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 };

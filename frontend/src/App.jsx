@@ -90,7 +90,11 @@ function App() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
+<<<<<<< HEAD
         const response = await fetch('/api/products');
+=======
+        const response = await fetch('http://localhost:5000/api/products');
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
         const data = await response.json();
         setProducts(data.data || data || []);
       } catch (error) {

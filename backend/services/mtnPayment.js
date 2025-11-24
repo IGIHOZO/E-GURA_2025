@@ -12,7 +12,11 @@ class MTNPaymentService {
     this.subscriptionKey = process.env.MTN_SUBSCRIPTION_KEY;
     this.apiUser = process.env.MTN_API_USER;
     this.apiKey = process.env.MTN_API_KEY;
+<<<<<<< HEAD
     this.callbackUrl = process.env.MTN_CALLBACK_URL || 'https://egura.rw/api/payments/callback';
+=======
+    this.callbackUrl = process.env.MTN_CALLBACK_URL || 'http://localhost:5000/api/payments/callback';
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     this.environment = process.env.MTN_ENVIRONMENT || 'sandbox';
   }
 

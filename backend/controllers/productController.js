@@ -1,5 +1,8 @@
 const { Product } = require('../models');
+<<<<<<< HEAD
 const { invalidateProductData } = require('../services/cacheInvalidation');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 // const { getAIRecommendations, aiSearch } = require('../utils/ai'); // Placeholder for AI
 
 const getProducts = async (req, res) => {
@@ -73,7 +76,10 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
+<<<<<<< HEAD
     await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -84,7 +90,10 @@ const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
+<<<<<<< HEAD
     await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     res.json(product);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -95,7 +104,10 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
+<<<<<<< HEAD
     await invalidateProductData(product.id || product._id);
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -233,7 +245,10 @@ const updateProductStock = async (req, res) => {
     }
 
     await product.update({ stockQuantity: newStock });
+<<<<<<< HEAD
     await invalidateProductData(product.id || product._id, { skipCategories: true });
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
     res.json(product);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -63,7 +63,11 @@ COMPLETE DATA FLOW
 
 1. CHECKOUT PROCESS:
    User fills form → Submits order → Frontend calls:
+<<<<<<< HEAD
    POST https://egura.rw/api/orders
+=======
+   POST http://localhost:5000/api/orders
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
    {
      items: [...],
      shippingAddress: { phone: "0782540683", ... },

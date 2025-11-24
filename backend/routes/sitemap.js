@@ -65,6 +65,16 @@ router.get('/', async (req, res) => {
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
   </url>
   
+<<<<<<< HEAD
+=======
+  <!-- AI Features -->
+  <url>
+    <loc>https://egura.rw/virtual-tryon</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+  </url>
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   
   <!-- Blog -->
   <url>

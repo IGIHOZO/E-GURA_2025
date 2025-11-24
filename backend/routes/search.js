@@ -3,7 +3,10 @@ const router = express.Router();
 const { Product } = require('../models');
 const { wrapModel } = require('../utils/db-adapter');
 const { Op } = require('sequelize');
+<<<<<<< HEAD
 const cacheResponse = require('../middleware/cacheMiddleware');
+=======
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 // Helper function to sort products
 function sortProducts(products, sortBy) {
@@ -105,9 +108,13 @@ function calculateRelevanceScore(product, query) {
 }
 
 // Simple health check
+<<<<<<< HEAD
 router.get('/health', cacheResponse(30, {
   tags: ['search']
 }), (req, res) => {
+=======
+router.get('/health', (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   res.json({ 
     success: true, 
     message: 'Search routes are working!',
@@ -257,6 +264,7 @@ const searchProducts = async (req, res) => {
 
 // Register both GET and POST routes
 router.post('/products', searchProducts);
+<<<<<<< HEAD
 router.get('/products', cacheResponse(90, {
   keyBuilder: (req) => {
     let filters = {};
@@ -281,15 +289,22 @@ router.get('/products', cacheResponse(90, {
   },
   tags: ['search', 'products:search']
 }), searchProducts);
+=======
+router.get('/products', searchProducts);
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 
 /**
  * AI-Powered Product Recommendations
  * GET /api/search/recommendations
  */
+<<<<<<< HEAD
 router.get('/recommendations', cacheResponse(120, {
   keyBuilder: (req) => `recommendations:${req.query.productId || 'global'}:${req.query.category || 'all'}:${req.query.limit || 8}`,
   tags: ['search', 'products:recommendations']
 }), async (req, res) => {
+=======
+router.get('/recommendations', async (req, res) => {
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
   try {
     const { productId, category, limit = 8 } = req.query;
     

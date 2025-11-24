@@ -5,10 +5,17 @@ echo ===========================================================================
 echo.
 
 echo Checking Backend (Port 5000)...
+<<<<<<< HEAD
 curl -s https://egura.rw/api/health > nul 2>&1
 if %errorlevel% == 0 (
     echo ✅ Backend is RUNNING on port 5000
     curl -s https://egura.rw/api/health
+=======
+curl -s http://localhost:5000/api/health > nul 2>&1
+if %errorlevel% == 0 (
+    echo ✅ Backend is RUNNING on port 5000
+    curl -s http://localhost:5000/api/health
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
 ) else (
     echo ❌ Backend is NOT RUNNING on port 5000
     echo.
