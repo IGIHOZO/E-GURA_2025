@@ -1,0 +1,346 @@
+/* Device-Specific Optimizations */
+/* Automatically applied based on device detection */
+
+/* Desktop Optimizations */
+.device-desktop {
+  /* Enable hardware acceleration for smooth animations */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.device-desktop .hover-effects {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.device-desktop .hover-effects:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Large Desktop Optimizations */
+.device-largeDesktop {
+  /* Optimize for large screens */
+  --container-max-width: 1400px;
+  --grid-columns: 6;
+  --font-scale: 1.1;
+}
+
+.device-largeDesktop .container {
+  max-width: var(--container-max-width);
+}
+
+.device-largeDesktop .text-responsive {
+  font-size: calc(1rem * var(--font-scale));
+}
+
+/* Mobile Optimizations */
+.device-mobile {
+  /* Optimize for touch and small screens */
+  --touch-target-min: 44px;
+  --font-scale: 0.9;
+}
+
+.device-mobile .touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+.device-mobile .hover-effects {
+  /* Disable hover effects on mobile */
+  transition: none;
+}
+
+.device-mobile .hover-effects:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Tablet Optimizations */
+.device-tablet {
+  --grid-columns: 3;
+  --container-padding: 2rem;
+}
+
+/* High DPI Screen Optimizations */
+.high-dpi {
+  /* Crisp rendering for high DPI screens */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.high-dpi img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Slow Connection Optimizations */
+.slow-connection {
+  /* Reduce visual complexity for slow connections */
+  --animation-duration: 0s;
+  --transition-duration: 0s;
+}
+
+.slow-connection * {
+  animation-duration: var(--animation-duration) !important;
+  transition-duration: var(--transition-duration) !important;
+}
+
+.slow-connection .background-image {
+  /* Use solid colors instead of images */
+  background-image: none !important;
+  background-color: #f3f4f6;
+}
+
+/* Fast Connection Optimizations */
+.fast-connection {
+  /* Enable all visual enhancements */
+  --animation-duration: 0.3s;
+  --transition-duration: 0.3s;
+}
+
+/* Reduced Motion Preferences */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Screen Size Specific Optimizations */
+.screen-xs {
+  --container-padding: 1rem;
+  --grid-gap: 0.5rem;
+  --font-size-base: 14px;
+}
+
+.screen-sm {
+  --container-padding: 1.5rem;
+  --grid-gap: 1rem;
+  --font-size-base: 15px;
+}
+
+.screen-md {
+  --container-padding: 2rem;
+  --grid-gap: 1.5rem;
+  --font-size-base: 16px;
+}
+
+.screen-lg {
+  --container-padding: 2.5rem;
+  --grid-gap: 2rem;
+  --font-size-base: 16px;
+}
+
+.screen-xl {
+  --container-padding: 3rem;
+  --grid-gap: 2.5rem;
+  --font-size-base: 17px;
+}
+
+.screen-2xl {
+  --container-padding: 4rem;
+  --grid-gap: 3rem;
+  --font-size-base: 18px;
+}
+
+/* Orientation Optimizations */
+.orientation-landscape.device-mobile {
+  /* Optimize mobile landscape layout */
+  --header-height: 60px;
+  --navigation-height: 50px;
+}
+
+.orientation-portrait.device-mobile {
+  /* Optimize mobile portrait layout */
+  --header-height: 70px;
+  --navigation-height: 60px;
+}
+
+/* Performance Tier Optimizations */
+.performance-tier-high {
+  /* Enable all visual effects for high-performance devices */
+  --blur-effects: blur(10px);
+  --shadow-effects: 0 20px 40px rgba(0, 0, 0, 0.1);
+  --gradient-effects: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.performance-tier-medium {
+  /* Moderate effects for medium-performance devices */
+  --blur-effects: blur(5px);
+  --shadow-effects: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --gradient-effects: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.performance-tier-low {
+  /* Minimal effects for low-performance devices */
+  --blur-effects: none;
+  --shadow-effects: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --gradient-effects: #667eea;
+}
+
+/* Desktop-Specific Component Styles */
+.device-desktop .product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.device-largeDesktop .product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.device-mobile .product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+/* Desktop Navigation Enhancements */
+.device-desktop .navigation-menu {
+  /* Enable advanced hover effects */
+  position: relative;
+}
+
+.device-desktop .navigation-menu::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #f97316, #ea580c);
+  transition: width 0.3s ease;
+}
+
+.device-desktop .navigation-menu:hover::before {
+  width: 100%;
+}
+
+/* Image Loading Optimizations */
+.device-desktop img[loading="lazy"] {
+  /* Preload images on desktop for better UX */
+  loading: eager;
+}
+
+.device-mobile img {
+  /* Optimize images for mobile */
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Typography Optimizations */
+.device-desktop {
+  /* Better typography for desktop reading */
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.device-mobile {
+  /* Optimize typography for mobile reading */
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* Button Optimizations */
+.device-desktop .btn {
+  /* Desktop button styles */
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.device-mobile .btn {
+  /* Mobile-optimized buttons */
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 0.75rem;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Form Optimizations */
+.device-mobile input,
+.device-mobile select,
+.device-mobile textarea {
+  /* Mobile form optimizations */
+  font-size: 16px; /* Prevent zoom on iOS */
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.device-desktop input,
+.device-desktop select,
+.device-desktop textarea {
+  /* Desktop form optimizations */
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+}
+
+/* Animation Performance */
+.device-desktop .animate-on-scroll {
+  /* Enable scroll animations on desktop */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.device-desktop .animate-on-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.device-mobile .animate-on-scroll {
+  /* Disable scroll animations on mobile for performance */
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Loading States */
+.device-desktop .loading-skeleton {
+  /* Smooth skeleton loading for desktop */
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.device-mobile .loading-skeleton {
+  /* Simple loading for mobile */
+  background: #f0f0f0;
+  animation: none;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Utility Classes */
+.desktop-only {
+  display: none;
+}
+
+.device-desktop .desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.device-mobile .mobile-only {
+  display: block;
+}
+
+.tablet-only {
+  display: none;
+}
+
+.device-tablet .tablet-only {
+  display: block;
+}

@@ -1,0 +1,42 @@
+User-agent: *
+Allow: /
+
+# Dynamic Sitemap
+Sitemap: https://egura.rw/api/sitemap
+
+# Disallow admin and internal areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /test/
+Disallow: /diagnostic
+Disallow: /cleanup
+Disallow: /*?*test=
+Disallow: /*?*debug=
+
+# Allow important pages for all crawlers
+Allow: /shop
+Allow: /shop/*
+Allow: /product/*
+Allow: /blog
+Allow: /blog/*
+Allow: /about
+Allow: /contact
+Allow: /tracking
+
+# Special rules for Google
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Special rules for Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay (seconds)
+Crawl-delay: 1
+
+# Host preference
+Host: https://egura.rw

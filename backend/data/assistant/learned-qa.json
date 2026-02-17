@@ -1,0 +1,68 @@
+[
+  {
+    "question": "Tell me about laptops",
+    "answer": null,
+    "createdAt": "2025-11-27T20:26:43.541Z",
+    "lastAskedAt": "2025-11-27T20:42:23.816Z",
+    "occurrences": 3,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0.538899871645092
+    }
+  },
+  {
+    "question": "accepted",
+    "answer": null,
+    "createdAt": "2025-11-27T21:10:06.809Z",
+    "lastAskedAt": "2025-11-27T21:10:06.809Z",
+    "occurrences": 1,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0.2364761428621822
+    }
+  },
+  {
+    "question": "proceed",
+    "answer": null,
+    "createdAt": "2025-11-27T21:52:37.754Z",
+    "lastAskedAt": "2025-11-27T21:52:37.754Z",
+    "occurrences": 1,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0.21332470309684431
+    }
+  },
+  {
+    "question": "What",
+    "answer": null,
+    "createdAt": "2025-12-24T11:43:09.939Z",
+    "lastAskedAt": "2025-12-24T11:43:09.939Z",
+    "occurrences": 1,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0
+    }
+  },
+  {
+    "question": "So soft",
+    "answer": null,
+    "createdAt": "2026-01-08T10:34:47.588Z",
+    "lastAskedAt": "2026-01-08T10:34:47.588Z",
+    "occurrences": 1,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0
+    }
+  },
+  {
+    "question": "The product is called so soft",
+    "answer": null,
+    "createdAt": "2026-01-08T10:35:05.454Z",
+    "lastAskedAt": "2026-01-08T10:35:05.454Z",
+    "occurrences": 1,
+    "metadata": {
+      "reason": "low_confidence",
+      "score": 0.2877090727621797
+    }
+  }
+]

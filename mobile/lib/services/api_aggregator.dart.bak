@@ -1,0 +1,131 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
+
+class APIAggregator {
+  static const Duration _requestTimeout = Duration(seconds: 30);
+  static const int _maxBatchSize = 10;
+  
+  // Batch multiple requests into single call
+  static Future<Map<String, dynamic>> batchRequest(List<Map<String, String>> requests) async {
+    try {
+      final batchPayload = {
+        'requests': requests.take(_maxBatchSize).toList(),
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      
+      debugPrint('[APIAggregator] Batching ${requests.length} requests');
+      
+      final response = await http.post(
+        Uri.parse('${ApiConfig.apiUrl}/batch'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(batchPayload),
+      ).timeout(_requestTimeout);
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('[APIAggregator] Batch response: ${data['responses'].length} items');
+        return data['responses'];
+      }
+      
+      throw Exception('Batch request failed');
+    } catch (e) {
+      debugPrint('[APIAggregator] Batch error: $e');
+      
+      // Fallback to individual requests
+      return await _executeIndividualRequests(requests);
+    }
+  }
+  
+  // Execute individual requests as fallback
+  static Future<Map<String, dynamic>> _executeIndividualRequests(List<Map<String, String>> requests) async {
+    final results = <String, dynamic>{};
+    
+    for (final request in requests) {
+      try {
+        final response = await http.get(
+          Uri.parse('${ApiConfig.apiUrl}/${request['endpoint']}'),
+          headers: {'Content-Type': 'application/json'},
+        ).timeout(_requestTimeout);
+        
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          results[request['id']] = responseData;
+        }
+      } catch (e) {
+        debugPrint('[APIAggregator] Individual request failed: $e');
+        results[request['id']] = {'error': e.toString()};
+      }
+    }
+    
+    return results;
+  }
+  
+  // Smart request combining
+  static Future<Map<String, dynamic>> smartRequest({
+    required String endpoint,
+    Map<String, dynamic>? data,
+    bool useCache = true,
+  }) async {
+    final requestId = '${endpoint}_${DateTime.now().millisecondsSinceEpoch}';
+    
+    final request = {
+      'id': requestId,
+      'endpoint': endpoint,
+      'data': data ?? {},
+      'useCache': useCache,
+    };
+    
+    debugPrint('[APIAggregator] Smart request: $endpoint');
+    
+    // Try batch first
+    final batchResult = await batchRequest([request]);
+    
+    if (batchResult[requestId] != null) {
+      return batchResult[requestId] as Map<String, dynamic>;
+    }
+    
+    // Fallback to direct API call
+    return await _directAPICall(endpoint, data);
+  }
+  
+  // Direct API call with caching
+  static Future<Map<String, dynamic>> _directAPICall(String endpoint, Map<String, dynamic>? data) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.apiUrl}/$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(_requestTimeout);
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      
+      throw Exception('API call failed');
+    } catch (e) {
+      debugPrint('[APIAggregator] Direct API error: $e');
+      rethrow;
+    }
+  }
+  
+  // Preload critical data
+  static Future<void> preloadCriticalData() async {
+    final criticalEndpoints = [
+      'categories',
+      'products/home-feed',
+      'products/featured',
+    ];
+    
+    debugPrint('[APIAggregator] Preloading ${criticalEndpoints.length} critical endpoints');
+    
+    for (final endpoint in criticalEndpoints) {
+      try {
+        await smartRequest(endpoint: endpoint);
+      } catch (e) {
+        debugPrint('[APIAggregator] Preload failed for $endpoint: $e');
+      }
+    }
+  }
+}

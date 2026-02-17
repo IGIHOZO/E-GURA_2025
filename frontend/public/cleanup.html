@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalStorage Cleanup</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .status {
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+    }
+    .success {
+      background: #d4edda;
+      border: 1px solid #28a745;
+      color: #155724;
+    }
+    .info {
+      background: #d1ecf1;
+      border: 1px solid #17a2b8;
+      color: #0c5460;
+    }
+    button {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 10px 10px 0;
+    }
+    button:hover {
+      background: #ea580c;
+    }
+    button.danger {
+      background: #dc3545;
+    }
+    button.danger:hover {
+      background: #c82333;
+    }
+    .report {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 LocalStorage Cleanup Tool</h1>
+    <p>This tool helps fix the "QuotaExceededError" by cleaning up old order data.</p>
+
+    <div id="status"></div>
+    
+    <div id="report"></div>
+
+    <div>
+      <button onclick="checkStorage()">📊 Check Storage</button>
+      <button onclick="cleanupOldOrders()">🧹 Clean Old Orders</button>
+      <button onclick="clearAllOrders()" class="danger">🚨 Clear All Orders</button>
+      <button onclick="window.location.href='/'">← Back to Site</button>
+    </div>
+  </div>
+
+  <script>
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+    }
+
+    function showReport(report) {
+      const reportDiv = document.getElementById('report');
+      reportDiv.innerHTML = `<div class="report">${report}</div>`;
+    }
+
+    function getStorageSize() {
+      let total = 0;
+      for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          total += localStorage[key].length + key.length;
+        }
+      }
+      return (total / 1024).toFixed(2);
+    }
+
+    function checkStorage() {
+      const size = getStorageSize();
+      const limit = 5120; // 5MB typical limit
+      const percent = ((size / limit) * 100).toFixed(1);
+
+      let report = `<strong>Storage Usage Report:</strong><br><br>`;
+      report += `Total Size: ${size} KB / ${limit} KB (${percent}%)<br><br>`;
+      report += `<strong>Items:</strong><br>`;
+
+      let items = [];
+      for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          const itemSize = (localStorage[key].length / 1024).toFixed(2);
+          items.push({ key, size: parseFloat(itemSize) });
+        }
+      }
+
+      items.sort((a, b) => b.size - a.size);
+      items.forEach(item => {
+        report += `${item.key}: ${item.size} KB<br>`;
+      });
+
+      showReport(report);
+
+      if (size > 4096) {
+        showStatus('⚠️ Storage is over 80% full! Cleanup recommended.', 'warning');
+      } else {
+        showStatus('✅ Storage is healthy.', 'success');
+      }
+    }
+
+    function cleanupOldOrders() {
+      try {
+        const before = getStorageSize();
+        
+        // Remove duplicate order arrays
+        localStorage.removeItem('orders');
+        localStorage.removeItem('customer_orders');
+        localStorage.removeItem('all_orders');
+        
+        // Keep only last 50 admin orders
+        const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+        if (adminOrders.length > 50) {
+          const recent = adminOrders.slice(-50);
+          localStorage.setItem('adminOrders', JSON.stringify(recent));
+        }
+        
+        const after = getStorageSize();
+        const freed = (before - after).toFixed(2);
+        
+        showStatus(`✅ Cleanup complete! Freed ${freed} KB of space. (${before} KB → ${after} KB)`, 'success');
+        checkStorage();
+      } catch (error) {
+        showStatus(`❌ Cleanup failed: ${error.message}`, 'warning');
+      }
+    }
+
+    function clearAllOrders() {
+      if (!confirm('⚠️ This will delete ALL order data from localStorage. Continue?')) {
+        return;
+      }
+
+      try {
+        const before = getStorageSize();
+        
+        localStorage.removeItem('orders');
+        localStorage.removeItem('adminOrders');
+        localStorage.removeItem('customer_orders');
+        localStorage.removeItem('all_orders');
+        
+        const after = getStorageSize();
+        const freed = (before - after).toFixed(2);
+        
+        showStatus(`✅ All orders cleared! Freed ${freed} KB of space.`, 'success');
+        checkStorage();
+      } catch (error) {
+        showStatus(`❌ Failed: ${error.message}`, 'warning');
+      }
+    }
+
+    // Auto-check on load
+    window.onload = checkStorage;
+  </script>
+</body>
+</html>

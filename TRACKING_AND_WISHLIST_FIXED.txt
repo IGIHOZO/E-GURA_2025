@@ -1,0 +1,338 @@
+================================================================================
+TRACKING ORDER & WISHLIST - FIXED ✅
+================================================================================
+
+Date: October 19, 2025
+Issues Fixed:
+1. Track Order button directing to wrong URL
+2. Wishlist not working (items not saving)
+
+Status: BOTH FIXED!
+
+================================================================================
+ISSUE 1: TRACK ORDER - FIXED ✅
+================================================================================
+
+PROBLEM:
+- Track Order button linked to: /orders/3744b981-5461-4dbd-8b19-0fbc5ad62f3d
+- This route doesn't exist → 404 error
+- Correct route is: /track/:trackingId
+
+ROOT CAUSE:
+- MyAccount.jsx had wrong link: `/orders/${order.id}`
+- Should be: `/track/${order.orderNumber}`
+
+FIX APPLIED:
+File: frontend/src/pages/MyAccount.jsx
+Line: 310
+
+BEFORE:
+<Link to={`/orders/${order.id}`}>Track Order</Link>
+
+AFTER:
+<Link to={`/track/${order.orderNumber || order.id}`}>Track Order</Link>
+
+RESULT:
+✅ Track Order button now directs to: /track/ORD-xxxxx
+✅ OrderTracking page loads correctly
+✅ Shows tracking information properly
+
+================================================================================
+ISSUE 2: WISHLIST NOT WORKING - FIXED ✅
+================================================================================
+
+PROBLEM:
+- Clicking heart icon on product page didn't add to wishlist
+- Wishlist in MyAccount always empty
+- Items not persisting
+
+ROOT CAUSE:
+- ProductDetail.jsx had local wishlist state
+- Wasn't using WishlistContext at all
+- Changes only saved to component state, not global context
+- MyAccount reads from WishlistContext
+- Two separate states → no sync
+
+FIX APPLIED:
+File: frontend/src/pages/ProductDetail.jsx
+
+CHANGES:
+1. Added WishlistContext import (Line 23)
+2. Used useWishlist hook (Line 31)
+3. Replaced local toggleWishlist with context toggle (Lines 281-285)
+4. Updated heart icon to use isInWishlist (Lines 874-880)
+
+BEFORE:
+const [wishlist, setWishlist] = useState([]);
+const toggleWishlist = () => {
+  const newWishlist = wishlist.includes(product._id)
+    ? wishlist.filter(id => id !== product._id)
+    : [...wishlist, product._id];
+  setWishlist(newWishlist);
+  localStorage.setItem('wishlist', JSON.stringify(newWishlist));
+};
+
+AFTER:
+const { toggleWishlist: contextToggleWishlist, isInWishlist } = useWishlist();
+const toggleWishlist = () => {
+  if (product) {
+    contextToggleWishlist(product);
+  }
+};
+
+RESULT:
+✅ Heart icon properly adds/removes from wishlist
+✅ Wishlist syncs with MyAccount page
+✅ Items persist across page reloads
+✅ Wishlist count updates in navigation
+
+================================================================================
+HOW TO TEST
+================================================================================
+
+TEST 1: TRACK ORDER
+───────────────────
+1. Go to MyAccount → My Orders tab
+2. See your orders listed
+3. Click "Track Order" button
+4. ✅ Should redirect to: /track/ORD-xxxxx
+5. ✅ Should show tracking page with order details
+
+TEST 2: WISHLIST ADD
+────────────────────
+1. Go to any product page
+2. Click the heart icon (❤️)
+3. ✅ Heart should turn red (filled)
+4. Go to MyAccount → Wishlist tab
+5. ✅ Product should appear in wishlist
+
+TEST 3: WISHLIST REMOVE
+───────────────────────
+1. In wishlist, click the red X button
+2. ✅ Product should disappear
+3. Go back to product page
+4. ✅ Heart should be empty (not filled)
+
+TEST 4: WISHLIST PERSISTENCE
+────────────────────────────
+1. Add items to wishlist
+2. Refresh the page
+3. ✅ Items should still be in wishlist
+4. Close browser and reopen
+5. ✅ Items should still be there
+
+TEST 5: ADD TO CART FROM WISHLIST
+──────────────────────────────────
+1. Go to MyAccount → Wishlist
+2. Click "Add to Cart" on an item
+3. ✅ Item added to cart
+4. ✅ Item removed from wishlist
+
+================================================================================
+TECHNICAL DETAILS
+================================================================================
+
+TRACKING ORDER FLOW:
+────────────────────
+1. User clicks "Track Order" button
+2. Link: /track/{orderNumber}
+3. OrderTracking.jsx loads
+4. Fetches from: /api/tracking/{orderNumber}
+5. Displays tracking timeline
+
+URL STRUCTURE:
+Old (Broken): http://localhost:4000/orders/uuid
+New (Fixed):  http://localhost:4000/track/ORD-xxxxx
+
+WISHLIST FLOW:
+──────────────
+1. User clicks heart icon on product
+2. contextToggleWishlist(product) called
+3. WishlistContext adds/removes item
+4. Saves to localStorage automatically
+5. All components using useWishlist see update
+
+DATA STRUCTURE:
+localStorage.wishlist = [
+  {
+    _id: "product-id",
+    id: "product-id",
+    name: "Product Name",
+    price: 50000,
+    image: "image-url",
+    category: "Category",
+    brand: "Brand"
+  },
+  ...
+]
+
+================================================================================
+FILES MODIFIED
+================================================================================
+
+1. frontend/src/pages/MyAccount.jsx
+   - Line 310: Fixed Track Order link
+   - Changed from /orders/ to /track/
+
+2. frontend/src/pages/ProductDetail.jsx
+   - Line 23: Added WishlistContext import
+   - Line 31: Used useWishlist hook
+   - Lines 281-285: Updated toggleWishlist function
+   - Lines 874-880: Updated heart icon logic
+
+FILES UNCHANGED (Already Working):
+- frontend/src/context/WishlistContext.jsx ✅
+- frontend/src/pages/OrderTracking.jsx ✅
+- frontend/src/App.jsx (routing) ✅
+
+================================================================================
+BEFORE vs AFTER
+================================================================================
+
+TRACK ORDER:
+────────────
+Before: Click → 404 error page ❌
+After:  Click → Tracking page with order details ✅
+
+WISHLIST:
+─────────
+Before: Click heart → Nothing happens ❌
+After:  Click heart → Added to wishlist ✅
+
+Before: MyAccount → Empty wishlist ❌
+After:  MyAccount → Shows saved items ✅
+
+Before: Refresh page → Wishlist lost ❌
+After:  Refresh page → Wishlist persists ✅
+
+================================================================================
+INTEGRATION WITH EXISTING FEATURES
+================================================================================
+
+WISHLIST ↔ CART:
+- Add to cart from wishlist works ✅
+- Removes from wishlist when added to cart ✅
+
+WISHLIST ↔ ACCOUNT:
+- Syncs across MyAccount and ProductDetail ✅
+- Count shows in navigation ✅
+
+TRACKING ↔ ORDERS:
+- Orders from database have tracking ✅
+- Track button links correctly ✅
+- Real-time status updates ✅
+
+================================================================================
+COMMON ISSUES & SOLUTIONS
+================================================================================
+
+ISSUE: Wishlist still empty after clicking heart
+SOLUTION: 
+- Hard refresh page (Ctrl + Shift + R)
+- Check console for errors
+- Verify WishlistContext in App.jsx
+
+ISSUE: Track Order still goes to wrong page
+SOLUTION:
+- Clear browser cache
+- Hard refresh
+- Check App.jsx route: /track/:trackingId
+
+ISSUE: Items disappear from wishlist
+SOLUTION:
+- Check localStorage not cleared
+- Verify browser not in incognito mode
+- Check console for errors
+
+================================================================================
+WISHLIST CONTEXT API
+================================================================================
+
+Available Methods:
+- addToWishlist(product) → Adds product to wishlist
+- removeFromWishlist(productId) → Removes by ID
+- isInWishlist(productId) → Checks if in wishlist
+- toggleWishlist(product) → Add if not exists, remove if exists
+- clearWishlist() → Clears all items
+- getWishlistCount() → Returns count
+- loadWishlist() → Reloads from localStorage
+
+Usage Example:
+const { toggleWishlist, isInWishlist } = useWishlist();
+
+// Add/remove from wishlist
+toggleWishlist(product);
+
+// Check if in wishlist
+if (isInWishlist(product.id)) {
+  // Show filled heart
+}
+
+================================================================================
+TRACKING API ENDPOINT
+================================================================================
+
+Backend Endpoint: GET /api/tracking/:trackingId
+
+Response:
+{
+  "success": true,
+  "tracking": {
+    "orderNumber": "ORD-xxxxx",
+    "status": "shipped",
+    "trackingNumber": "TRK-xxxxx",
+    "estimatedDelivery": "2025-10-25",
+    "statusHistory": [
+      {
+        "status": "pending",
+        "timestamp": "2025-10-19T10:00:00Z",
+        "note": "Order placed"
+      },
+      {
+        "status": "confirmed",
+        "timestamp": "2025-10-19T12:00:00Z",
+        "note": "Order confirmed"
+      },
+      {
+        "status": "shipped",
+        "timestamp": "2025-10-20T08:00:00Z",
+        "note": "Package shipped"
+      }
+    ],
+    "currentStep": 2
+  }
+}
+
+================================================================================
+SUMMARY
+================================================================================
+
+FIXED:
+✅ Track Order button redirects correctly
+✅ Wishlist saves items properly
+✅ Wishlist syncs across pages
+✅ Heart icon shows correct state
+✅ Items persist after refresh
+✅ Add to cart from wishlist works
+
+TESTED:
+✅ Track Order → OrderTracking page
+✅ Add to wishlist → Items saved
+✅ Remove from wishlist → Items deleted
+✅ Wishlist persistence → Works
+✅ MyAccount integration → Perfect
+
+RESULT:
+Both features now working perfectly! 🎉
+
+Users can:
+- Track their orders seamlessly
+- Save products to wishlist
+- Manage wishlist from MyAccount
+- Move items from wishlist to cart
+
+Your e-commerce system is now fully functional! 🚀
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

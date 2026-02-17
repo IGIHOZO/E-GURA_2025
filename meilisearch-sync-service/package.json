@@ -1,0 +1,54 @@
+{
+  "name": "meilisearch-sync-service",
+  "version": "1.0.0",
+  "description": "Meilisearch synchronization service for MongoDB e-commerce data",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "backfill": "ts-node src/backfill.ts",
+    "reindex": "ts-node src/reindex.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "dependencies": {
+    "mongoose": "^8.0.0",
+    "meilisearch": "^0.35.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "rate-limiter-flexible": "^3.0.3",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "meilisearch",
+    "mongodb",
+    "sync",
+    "search",
+    "ecommerce"
+  ],
+  "author": "SEWITHDEBBY",
+  "license": "MIT"
+}

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Connection Test</h1>
+    
+    <div class="test-box">
+        <h2>Current Connection Info</h2>
+        <div class="info">
+            <p><strong>Hostname:</strong> <span id="hostname"></span></p>
+            <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+            <p><strong>Detected API URL:</strong> <span id="api-url"></span></p>
+        </div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test Backend Connection</h2>
+        <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+        <button onclick="testProductsEndpoint()">Test Products Endpoint (3 items)</button>
+        <button onclick="testProductsEndpoint60()">Test Products Endpoint (60 items)</button>
+        <div id="health-result" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Console Logs</h2>
+        <pre id="console-log"></pre>
+    </div>
+
+    <script>
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            document.getElementById('console-log').textContent = logs.join('\n');
+        }
+
+        function getApiUrl() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return '/api';
+            }
+            return `${protocol}//${hostname}:5000/api`;
+        }
+
+        // Display connection info
+        document.getElementById('hostname').textContent = window.location.hostname;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('api-url').textContent = getApiUrl();
+
+        log('Page loaded');
+        log('Hostname: ' + window.location.hostname);
+        log('Detected API URL: ' + getApiUrl());
+
+        async function testHealthEndpoint() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = '<p>⏳ Testing health endpoint...</p>';
+            log('Testing health endpoint...');
+            
+            try {
+                const apiUrl = getApiUrl();
+                const url = `${apiUrl}/health`;
+                log('Fetching: ' + url);
+                
+                const response = await fetch(url);
+                log('Response status: ' + response.status);
+                
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data));
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Health check successful!</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                log('ERROR: ' + error.message, 'error');
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Health check failed!</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        async function testProductsEndpoint() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = '<p>⏳ Testing products endpoint (3 items)...</p>';
+            log('Testing products endpoint...');
+            
+            try {
+                const apiUrl = getApiUrl();
+                const url = `${apiUrl}/search/products?page=1&limit=3`;
+                log('Fetching: ' + url);
+                
+                const response = await fetch(url);
+                log('Response status: ' + response.status);
+                
+                const data = await response.json();
+                log('Received ' + (data.data?.length || 0) + ' products');
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ Products loaded successfully!</p>
+                    <p>Total: ${data.pagination?.total || 0} products</p>
+                    <p>Showing: ${data.data?.length || 0} products</p>
+                    <pre>${JSON.stringify(data.data?.[0], null, 2)}</pre>
+                `;
+            } catch (error) {
+                log('ERROR: ' + error.message, 'error');
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Products endpoint failed!</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        async function testProductsEndpoint60() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = '<p>⏳ Testing products endpoint (60 items)...</p>';
+            log('Testing products endpoint with 60 items...');
+            
+            try {
+                const apiUrl = getApiUrl();
+                const url = `${apiUrl}/search/products?page=1&limit=60`;
+                log('Fetching: ' + url);
+                
+                const startTime = performance.now();
+                const response = await fetch(url);
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+                
+                log('Response status: ' + response.status);
+                log('Request took: ' + duration + 'ms');
+                
+                const data = await response.json();
+                log('Received ' + (data.data?.length || 0) + ' products');
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ 60 Products loaded successfully!</p>
+                    <p>Total in DB: ${data.pagination?.total || 0} products</p>
+                    <p>Returned: ${data.data?.length || 0} products</p>
+                    <p>Response time: ${duration}ms</p>
+                    <p>Sample product names:</p>
+                    <ul>
+                        ${data.data?.slice(0, 5).map(p => `<li>${p.name} - RWF ${p.price}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                log('ERROR: ' + error.message, 'error');
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Products endpoint failed!</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

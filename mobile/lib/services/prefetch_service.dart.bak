@@ -1,0 +1,86 @@
+import 'dart:async';
+import 'dart:collection';
+import 'package:flutter/foundation.dart';
+import '../services/api_service.dart';
+import '../models/product.dart';
+
+class PrefetchService {
+  static final Map<int, List<Product>> _productCache = {};
+  static final Map<String, dynamic> _priceCache = {};
+  static Timer? _prefetchTimer;
+  
+  // Start background prefetching
+  static void startPrefetching() {
+    _prefetchTimer?.cancel();
+    _prefetchTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      _prefetchProducts();
+    });
+    
+    // Initial prefetch
+    _prefetchProducts();
+  }
+  
+  // Stop prefetching
+  static void stopPrefetching() {
+    _prefetchTimer?.cancel();
+  }
+  
+  // Prefetch products 11-30 in background
+  static Future<void> _prefetchProducts() async {
+    try {
+      final futures = <Future>[];
+      
+      // Prefetch pages 2-4 (products 11-60)
+      for (int page = 2; page <= 4; page++) {
+        futures.add(ApiService().getProducts(page: page, limit: 12));
+      }
+      
+      final results = await Future.wait(futures);
+      
+      for (int i = 0; i < results.length; i++) {
+        final paginated = results[i];
+        if (paginated != null) {
+          _productCache[2 + i] = paginated.products;
+          
+          // Cache prices for instant access
+          for (final product in paginated.products) {
+            _priceCache[product.id] = {
+              'price': product.price,
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+            };
+          }
+        }
+      }
+      
+      debugPrint('[PrefetchService] Prefetched ${results.length} pages (${results.fold(0, (sum, p) => sum + (p?.products.length ?? 0))} products)');
+    } catch (e) {
+      debugPrint('[PrefetchService] Prefetch failed: $e');
+    }
+  }
+  
+  // Get cached products instantly
+  static List<Product>? getCachedProducts(int page) {
+    return _productCache[page];
+  }
+  
+  // Get cached price instantly
+  static double? getCachedPrice(String productId) {
+    final cached = _priceCache[productId];
+    if (cached != null) {
+      final timestamp = cached['timestamp'] as int;
+      final age = DateTime.now().millisecondsSinceEpoch - timestamp;
+      
+      // Cache valid for 10 minutes
+      if (age < 600000) {
+        return cached['price'] as double;
+      }
+    }
+    return null;
+  }
+  
+  // Clear cache
+  static void clearCache() {
+    _productCache.clear();
+    _priceCache.clear();
+  }
+}

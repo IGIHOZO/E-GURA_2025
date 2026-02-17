@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Diagnostics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        .section {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: white;
+        }
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .success { border-left: 3px solid #10b981; }
+        .error { border-left: 3px solid #ef4444; }
+        .warning { border-left: 3px solid #f59e0b; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .data-display {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Cart & Buy Now Diagnostics</h1>
+        <p class="subtitle">This tool helps diagnose why Add to Cart and Buy Now aren't working</p>
+
+        <!-- System Status -->
+        <div class="section">
+            <h2>System Status</h2>
+            <div id="systemStatus"></div>
+        </div>
+
+        <!-- Products Check -->
+        <div class="section">
+            <h2>Products</h2>
+            <div id="productsStatus"></div>
+            <div class="button-group">
+                <button onclick="checkProducts()">Check Products</button>
+                <button onclick="addTestProduct()">Add Test Product</button>
+            </div>
+            <div id="productsData" class="data-display" style="display:none;"></div>
+        </div>
+
+        <!-- Cart Check -->
+        <div class="section">
+            <h2>Cart</h2>
+            <div id="cartStatus"></div>
+            <div class="button-group">
+                <button onclick="checkCart()">Check Cart</button>
+                <button onclick="testAddToCart()">Test Add to Cart</button>
+                <button onclick="clearCart()">Clear Cart</button>
+            </div>
+            <div id="cartData" class="data-display" style="display:none;"></div>
+        </div>
+
+        <!-- localStorage Check -->
+        <div class="section">
+            <h2>Browser Storage</h2>
+            <div id="storageStatus"></div>
+            <div class="button-group">
+                <button onclick="checkStorage()">Check Storage</button>
+                <button onclick="clearAllStorage()">Clear All Storage</button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <div class="button-group">
+                <button onclick="runFullDiagnostic()">🔍 Run Full Diagnostic</button>
+                <button onclick="fixCommonIssues()">🔧 Auto-Fix Common Issues</button>
+                <button onclick="window.location.href='/shop'">🛍️ Go to Shop</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        function addStatus(containerId, message, type = 'success') {
+            const container = document.getElementById(containerId);
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<span class="status-icon">${icon}</span><span>${message}</span>`;
+            container.appendChild(div);
+        }
+
+        function clearStatus(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        async function checkProducts() {
+            clearStatus('productsStatus');
+            const dataDiv = document.getElementById('productsData');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/products`);
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    addStatus('productsStatus', `Found ${data.data.length} products in database`, 'success');
+                    dataDiv.textContent = JSON.stringify(data.data, null, 2);
+                    dataDiv.style.display = 'block';
+                } else {
+                    addStatus('productsStatus', 'No products found in database', 'error');
+                    addStatus('productsStatus', 'Click "Add Test Product" to create one', 'warning');
+                }
+            } catch (error) {
+                addStatus('productsStatus', `Error: ${error.message}`, 'error');
+                addStatus('productsStatus', 'Backend might not be running', 'warning');
+            }
+        }
+
+        async function addTestProduct() {
+            clearStatus('productsStatus');
+            
+            try {
+                const testProduct = {
+                    name: 'Test Product ' + Date.now(),
+                    description: 'A test product for debugging',
+                    price: 25000,
+                    category: 'Test',
+                    sizes: ['S', 'M', 'L', 'XL'],
+                    colors: ['Red', 'Blue', 'Black'],
+                    stock: 10,
+                    mainImage: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500',
+                    images: ['https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500']
+                };
+
+                const response = await fetch(`${API_URL}/api/admin/products/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testProduct)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    addStatus('productsStatus', 'Test product created successfully!', 'success');
+                    addStatus('productsStatus', `Product ID: ${data.product._id}`, 'success');
+                    setTimeout(checkProducts, 500);
+                } else {
+                    addStatus('productsStatus', 'Failed to create product', 'error');
+                }
+            } catch (error) {
+                addStatus('productsStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkCart() {
+            clearStatus('cartStatus');
+            const dataDiv = document.getElementById('cartData');
+            
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                
+                if (cart.length > 0) {
+                    addStatus('cartStatus', `Cart has ${cart.length} items`, 'success');
+                    dataDiv.textContent = JSON.stringify(cart, null, 2);
+                    dataDiv.style.display = 'block';
+                } else {
+                    addStatus('cartStatus', 'Cart is empty', 'warning');
+                    dataDiv.style.display = 'none';
+                }
+            } catch (error) {
+                addStatus('cartStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testAddToCart() {
+            clearStatus('cartStatus');
+            
+            try {
+                let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                
+                const testItem = {
+                    id: 'test-' + Date.now(),
+                    _id: 'test-' + Date.now(),
+                    name: 'Test Product',
+                    price: 25000,
+                    mainImage: 'https://via.placeholder.com/300',
+                    size: 'M',
+                    color: 'Blue',
+                    quantity: 1
+                };
+                
+                cart.push(testItem);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                addStatus('cartStatus', 'Test item added to cart!', 'success');
+                setTimeout(checkCart, 500);
+            } catch (error) {
+                addStatus('cartStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearCart() {
+            clearStatus('cartStatus');
+            localStorage.removeItem('cart');
+            addStatus('cartStatus', 'Cart cleared', 'success');
+            document.getElementById('cartData').style.display = 'none';
+        }
+
+        function checkStorage() {
+            clearStatus('storageStatus');
+            
+            try {
+                const keys = Object.keys(localStorage);
+                addStatus('storageStatus', `localStorage has ${keys.length} keys`, 'success');
+                
+                keys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    const size = new Blob([value]).size;
+                    addStatus('storageStatus', `${key}: ${size} bytes`, 'success');
+                });
+            } catch (error) {
+                addStatus('storageStatus', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAllStorage() {
+            if (confirm('Clear all localStorage? This will log you out.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                clearStatus('storageStatus');
+                addStatus('storageStatus', 'All storage cleared', 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        async function runFullDiagnostic() {
+            clearStatus('systemStatus');
+            addStatus('systemStatus', 'Running full diagnostic...', 'warning');
+            
+            await checkProducts();
+            checkCart();
+            checkStorage();
+            
+            clearStatus('systemStatus');
+            addStatus('systemStatus', 'Diagnostic complete!', 'success');
+        }
+
+        async function fixCommonIssues() {
+            clearStatus('systemStatus');
+            addStatus('systemStatus', 'Attempting auto-fix...', 'warning');
+            
+            // Clear corrupted cart
+            localStorage.removeItem('cart');
+            localStorage.setItem('cart', '[]');
+            
+            // Check if products exist
+            try {
+                const response = await fetch(`${API_URL}/api/products`);
+                const data = await response.json();
+                
+                if (!data.success || !data.data || data.data.length === 0) {
+                    addStatus('systemStatus', 'No products found - adding test product...', 'warning');
+                    await addTestProduct();
+                }
+            } catch (error) {
+                addStatus('systemStatus', 'Could not connect to backend', 'error');
+            }
+            
+            addStatus('systemStatus', 'Auto-fix complete! Try adding to cart now.', 'success');
+        }
+
+        // Run on load
+        window.onload = () => {
+            runFullDiagnostic();
+        };
+    </script>
+</body>
+</html>

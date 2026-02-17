@@ -1,0 +1,104 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
+
+class ImageCacheService {
+  static const int _maxCacheSize = 100 * 1024 * 1024; // 100MB
+  static const Duration _cacheExpiry = Duration(days: 7);
+  
+  static late CacheManager _cacheManager;
+  
+  static Future<void> initialize() async {
+    _cacheManager = CacheManager(
+      Config(
+        key: 'imageCache',
+        stalePeriod: _cacheExpiry,
+        maxNrOfCacheObjects: 200,
+        repo: JsonCacheInfoRepository(databaseName: 'imageCache'),
+        fileService: HttpFileService(),
+      ),
+    );
+  }
+  
+  // Get cached image
+  static Future<File?> getCachedImage(String url) async {
+    try {
+      final fileInfo = await _cacheManager.getFileFromCache(url);
+      if (fileInfo != null) {
+        debugPrint('[ImageCache] Cache hit: $url');
+        return fileInfo.file;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[ImageCache] Cache error: $e');
+      return null;
+    }
+  }
+  
+  // Cache image from network
+  static Future<File> cacheImage(String url) async {
+    try {
+      debugPrint('[ImageCache] Caching: $url');
+      
+      // Download and cache
+      final fileInfo = await _cacheManager.downloadFile(url);
+      
+      // Preload common images
+      _preloadCommonImages();
+      
+      return fileInfo.file;
+    } catch (e) {
+      debugPrint('[ImageCache] Cache failed: $e');
+      rethrow;
+    }
+  }
+  
+  // Preload common images in background
+  static Future<void> _preloadCommonImages() async {
+    final commonUrls = [
+      'https://egura.rw/assets/images/logo.jpeg',
+      'https://egura.rw/assets/images/Mobile-Money.png',
+      'https://egura.rw/assets/images/momo-code.png',
+    ];
+    
+    for (final url in commonUrls) {
+      try {
+        await _cacheManager.downloadFile(url);
+        debugPrint('[ImageCache] Preloaded: $url');
+      } catch (e) {
+        debugPrint('[ImageCache] Preload failed: $e');
+      }
+    }
+  }
+  
+  // Clear cache
+  static Future<void> clearCache() async {
+    await _cacheManager.emptyCache();
+    debugPrint('[ImageCache] Cache cleared');
+  }
+  
+  // Get cache size
+  static Future<int> getCacheSize() async {
+    try {
+      final directory = await getTemporaryDirectory();
+      final cacheDir = Directory('${directory.path}/imageCache');
+      
+      if (await cacheDir.exists()) {
+        int totalSize = 0;
+        final files = cacheDir.listSync(recursive: true);
+        for (final file in files) {
+          if (file is File) {
+            totalSize += file.lengthSync();
+          }
+        }
+        return totalSize;
+      }
+    } catch (e) {
+      debugPrint('[ImageCache] Size calculation failed: $e');
+    }
+    return 0;
+  }
+}

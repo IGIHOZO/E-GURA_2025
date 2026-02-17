@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Test - Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .output {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .info {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Cart Functionality Test</h1>
+        <p>This page tests if the cart is working properly.</p>
+        
+        <div>
+            <button onclick="testAddToCart()">Test Add to Cart</button>
+            <button onclick="checkCart()">Check Cart</button>
+            <button onclick="clearCart()">Clear Cart</button>
+            <button onclick="checkLocalStorage()">Check localStorage</button>
+        </div>
+        
+        <div class="output" id="output">
+            <p class="info">Click a button to test...</p>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function testAddToCart() {
+            log('Testing add to cart...', 'info');
+            
+            try {
+                // Get current cart
+                let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                log(`Current cart has ${cart.length} items`, 'info');
+                
+                // Create test product
+                const testProduct = {
+                    id: 'test-' + Date.now(),
+                    _id: 'test-' + Date.now(),
+                    name: 'Test Product',
+                    price: 25000,
+                    mainImage: 'https://via.placeholder.com/300',
+                    size: 'M',
+                    color: 'Blue',
+                    quantity: 1
+                };
+                
+                // Add to cart
+                cart.push(testProduct);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                log('✅ Product added to cart successfully!', 'success');
+                log(`Cart now has ${cart.length} items`, 'success');
+                
+                checkCart();
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function checkCart() {
+            log('Checking cart...', 'info');
+            
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                log(`Cart has ${cart.length} items`, 'info');
+                
+                if (cart.length > 0) {
+                    cart.forEach((item, index) => {
+                        log(`Item ${index + 1}: ${item.name} - ${item.price} RWF (Size: ${item.size}, Color: ${item.color})`, 'info');
+                    });
+                } else {
+                    log('Cart is empty', 'info');
+                }
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function clearCart() {
+            log('Clearing cart...', 'info');
+            
+            try {
+                localStorage.removeItem('cart');
+                log('✅ Cart cleared successfully!', 'success');
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function checkLocalStorage() {
+            log('Checking localStorage...', 'info');
+            
+            try {
+                const keys = Object.keys(localStorage);
+                log(`localStorage has ${keys.length} keys`, 'info');
+                
+                keys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    const size = new Blob([value]).size;
+                    log(`${key}: ${size} bytes`, 'info');
+                });
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-check cart on load
+        window.onload = () => {
+            log('Page loaded, checking cart...', 'info');
+            checkCart();
+        };
+    </script>
+</body>
+</html>

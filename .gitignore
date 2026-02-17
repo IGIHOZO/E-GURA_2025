@@ -1,0 +1,34 @@
+<<<<<<< HEAD
+node_modules
+.cache
+=======
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.out/
+.next/
+
+# IDE / editor
+.idea/
+.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Env files
+.env
+.env.*
+.env.local
+.env.meilisearch
+
+# Misc
+.DS_Store
+.early.coverage
+>>>>>>> 1a15362f9dae7bb17aa91f0abab9fb8ce9627742
