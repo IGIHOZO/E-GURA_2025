@@ -70,7 +70,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Categories',
+          'Categoriess',
           style: TextStyle(
             color: Color(0xFF1A1A1A),
             fontWeight: FontWeight.w600,

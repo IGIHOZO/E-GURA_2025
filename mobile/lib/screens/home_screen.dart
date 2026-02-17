@@ -1,8 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
 import '../config/api_config.dart';
 import '../config/theme.dart';
 import '../providers/home_provider.dart';
@@ -13,12 +12,12 @@ import '../widgets/product_card.dart';
 import '../widgets/shimmer_banner.dart';
 import '../widgets/shimmer_product_card.dart';
 import '../widgets/shimmer_product_grid.dart';
+import '../services/api_service.dart';
 // import '../services/asset_manager.dart';
 // import '../services/prefetch_service.dart';
 // import '../services/image_cache_service.dart';
 // import '../services/optimistic_ui.dart';
 // import '../services/background_sync.dart';
-import '../services/api_service.dart';
 // import '../services/api_aggregator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'product_detail_screen.dart';
@@ -34,11 +33,41 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   late Timer _countdownTimer;
   Duration _timeLeft = Duration.zero;
   int _currentBannerIndex = 0;
+  Map<String, String> _categoryImages = {};
+  List<Category> _shuffledCategories = [];
+  late AnimationController _fadeController;
+
+  Future<void> _loadCategoryImages(List<Category> categories) async {
+    // Shuffle categories for random order
+    if (_shuffledCategories.isEmpty) {
+      _shuffledCategories = List.from(categories)..shuffle();
+    }
+    
+    // Start fade-in animation
+    _fadeController.forward(from: 0.0);
+    
+    for (final category in _shuffledCategories) {
+      if (!_categoryImages.containsKey(category.id)) {
+        try {
+          final products = await ApiService().getProductsByCategory(category.id);
+          if (products.isNotEmpty) {
+            // Pick a random product image instead of always the first one
+            final randomProduct = products[Random().nextInt(products.length)];
+            setState(() {
+              _categoryImages[category.id] = randomProduct.mainImage ?? '';
+            });
+          }
+        } catch (e) {
+          // Continue even if image fetch fails
+        }
+      }
+    }
+  }
 
   Duration _getTimeUntilMidnight() {
     final now = DateTime.now();
@@ -49,6 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
     // Preload assets to prevent AssetManifest.bin errors
     // AssetManager.preloadAssets();
     
@@ -76,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _countdownTimer.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _fadeController.dispose();
     
     // Stop performance services
     // PrefetchService.stopPrefetching();
@@ -508,6 +543,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final cats = home.categories;
     if (cats.isEmpty) return const SizedBox.shrink();
 
+    // Load category images if not already loaded
+    if (_categoryImages.isEmpty) {
+      _loadCategoryImages(cats);
+    }
+    
+    // Start animations when categories are loaded
+    if (_categoryImages.isNotEmpty) {
+      _fadeController.forward(from: 0.0);
+    }
+
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -527,81 +572,128 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 85,
+            height: 90,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: cats.length,
+              itemCount: _shuffledCategories.length,
               itemBuilder: (context, index) {
-                final cat = cats[index];
-                final colors = [
-                  const Color(0xFFEF4444),
-                  const Color(0xFF8B5CF6),
-                  const Color(0xFF10B981),
-                  const Color(0xFFF59E0B),
-                  const Color(0xFF3B82F6),
-                  const Color(0xFFEC4899),
-                ];
-                final color = colors[index % colors.length];
-
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryProductsScreen(category: cat),
+                final cat = _shuffledCategories[index];
+                return TweenAnimationBuilder<double>(
+                  key: ValueKey('category_${cat.id}'),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: Duration(milliseconds: 300 + (index * 100)),
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: _buildModernCategoryItem(
+                        category: cat,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryProductsScreen(category: cat),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
-                  child: Container(
-                    width: 68,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                color.withOpacity(0.15),
-                                color.withOpacity(0.05),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: color.withOpacity(0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Icon(
-                            cat.materialIcon,
-                            color: color,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          cat.name.split(' ').first,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF374151),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
-                  ),
                 );
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildModernCategoryItem({
+    required Category category,
+    required VoidCallback onTap,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          splashColor: AppTheme.primaryColor.withOpacity(0.1),
+          highlightColor: Colors.transparent,
+          child: Container(
+            width: 68,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Category image with animation
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 1.0, end: 1.05),
+                  duration: const Duration(milliseconds: 150),
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: _categoryImages.containsKey(category.id) && _categoryImages[category.id]!.isNotEmpty
+                              ? Image.network(
+                                  ApiConfig.imageUrl(_categoryImages[category.id]!),
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    category.materialIcon,
+                                    color: AppTheme.primaryColor,
+                                    size: 20,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 6),
+                // Category name with fade-in animation
+                FadeTransition(
+                  opacity: _fadeController,
+                      child: Text(
+                        category.name,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF1A1A1A),
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

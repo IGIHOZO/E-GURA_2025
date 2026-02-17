@@ -1,13 +1,18 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../config/theme.dart';
+import '../config/api_config.dart';
 import '../providers/home_provider.dart';
 import '../models/category.dart';
 import '../models/subcategory.dart';
 import '../services/api_service.dart';
 import 'subcategory_products_screen.dart';
 import '../main.dart';
+
+const Color _blackWithOpacity = Color(0x0D000000);
+const Color _primaryColorWithOpacity = Color(0x1A7A1A80);
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -20,6 +25,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Category? _selectedCategory;
   List<Subcategory> _selectedSubcategories = [];
   bool _loadingSubcategories = false;
+  Map<String, String> _categoryImages = {};
+  Map<String, String> _subcategoryImages = {};
+  List<Category> _shuffledCategories = [];
 
   Future<void> _selectCategory(Category category) async {
     setState(() {
@@ -30,32 +38,85 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
     try {
       final subcategories = await ApiService().getSubcategories(category.id);
-      if (mounted) {
-        setState(() {
-          _selectedSubcategories = subcategories;
-          _loadingSubcategories = false;
-        });
+      
+      // Fetch product images for subcategories
+      for (final subcategory in subcategories) {
+        if (!_subcategoryImages.containsKey(subcategory.id)) {
+          try {
+            final products = await ApiService().getProductsBySubcategory(
+              subcategory.id, 
+              category.id
+            );
+            if (products.isNotEmpty) {
+              // Pick a random product image instead of always the first one
+              final randomProduct = products[Random().nextInt(products.length)];
+              setState(() {
+                _subcategoryImages[subcategory.id] = randomProduct.mainImage ?? '';
+              });
+            }
+          } catch (e) {
+            // Continue even if image fetch fails
+          }
+        }
       }
+      
+      setState(() {
+        _selectedSubcategories = subcategories;
+        _loadingSubcategories = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() => _loadingSubcategories = false);
+      setState(() {
+        _loadingSubcategories = false;
+      });
+    }
+  }
+
+  Future<void> _loadCategoryImages(List<Category> categories) async {
+    // Shuffle categories for random order
+    if (_shuffledCategories.isEmpty) {
+      _shuffledCategories = List.from(categories)..shuffle();
+    }
+    
+    for (final category in _shuffledCategories) {
+      if (!_categoryImages.containsKey(category.id)) {
+        try {
+          final products = await ApiService().getProductsByCategory(category.id);
+          if (products.isNotEmpty) {
+            // Pick a random product image instead of always the first one
+            final randomProduct = products[Random().nextInt(products.length)];
+            setState(() {
+              _categoryImages[category.id] = randomProduct.mainImage ?? '';
+            });
+          }
+        } catch (e) {
+          // Continue even if image fetch fails
+        }
       }
+    }
+    
+    // Auto-select the first (now shuffled) category if none is selected
+    if (_selectedCategory == null && _shuffledCategories.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _selectCategory(_shuffledCategories.first);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.white,
+        toolbarHeight: 56,
         title: const Text(
-          'Browse Categories',
+          'Categories',
           style: TextStyle(
             color: Color(0xFF1A1A1A),
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(
@@ -86,26 +147,35 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             return _buildEmptyState();
           }
 
+          // Load category images if not already loaded
+          if (_categoryImages.isEmpty) {
+            _loadCategoryImages(home.categories);
+          }
+
           return RefreshIndicator(
             onRefresh: () => home.loadHomeFeed(),
             child: Row(
               children: [
                 // Left sidebar - Categories
                 Container(
-                  width: 140,
+                  width: 120,
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    border: Border(
-                      right: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _blackWithOpacity,
+                        blurRadius: 1,
+                        offset: const Offset(1, 0),
+                      ),
+                    ],
                   ),
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: home.categories.length,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    itemCount: _shuffledCategories.length,
                     itemBuilder: (context, index) {
-                      final category = home.categories[index];
+                      final category = _shuffledCategories[index];
                       final isSelected = _selectedCategory?.id == category.id;
-                      return _buildCategoryItem(
+                      return _buildModernCategoryItem(
                         category: category,
                         isSelected: isSelected,
                         onTap: () => _selectCategory(category),
@@ -115,11 +185,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
                 // Right side - Subcategories
                 Expanded(
-                  child: _selectedCategory == null
-                      ? _buildSelectCategoryPrompt()
-                      : _loadingSubcategories
-                          ? const Center(child: CircularProgressIndicator())
-                          : _buildSubcategoriesGrid(),
+                  child: Container(
+                    color: Colors.white,
+                    child: _selectedCategory == null
+                        ? _buildModernSelectCategoryPrompt()
+                        : _loadingSubcategories
+                            ? _buildModernLoadingState()
+                            : _buildModernSubcategoriesGrid(),
+                  ),
                 ),
               ],
             ),
@@ -132,44 +205,52 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Widget _buildShimmerLoader() {
     return Row(
       children: [
-        Expanded(
-          flex: 1,
-          child: Container(
+        // Left column shimmer
+        Container(
+          width: 120,
+          decoration: const BoxDecoration(
             color: Colors.white,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: 6,
-              itemBuilder: (context, index) => Shimmer.fromColors(
-                baseColor: const Color(0xFFF0F0F0),
-                highlightColor: const Color(0xFFFAFAFA),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            boxShadow: [
+              BoxShadow(
+                color: _blackWithOpacity,
+                blurRadius: 1,
+                offset: const Offset(1, 0),
+              ),
+            ],
+          ),
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            itemCount: 6,
+            itemBuilder: (context, index) => Shimmer.fromColors(
+              baseColor: const Color(0xFFF5F5F5),
+              highlightColor: const Color(0xFFFAFAFA),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
           ),
         ),
+        // Right side shimmer
         Expanded(
-          flex: 2,
           child: Container(
-            color: const Color(0xFFFAFAFA),
+            color: Colors.white,
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: 4,
               itemBuilder: (context, index) => Shimmer.fromColors(
-                baseColor: const Color(0xFFF0F0F0),
+                baseColor: const Color(0xFFF5F5F5),
                 highlightColor: const Color(0xFFFAFAFA),
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  height: 100,
+                  height: 120,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
@@ -177,6 +258,37 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildModernLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: _primaryColorWithOpacity,
+              shape: BoxShape.circle,
+            ),
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              color: AppTheme.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Loading subcategories...',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF6B7280),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -217,7 +329,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildCategoryItem({
+  Widget _buildModernCategoryItem({
     required Category category,
     required bool isSelected,
     required VoidCallback onTap,
@@ -225,40 +337,112 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: AppTheme.primaryColor, width: 2) : null,
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppTheme.primaryColor : Colors.transparent,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              // Category image
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: _categoryImages.containsKey(category.id) && _categoryImages[category.id]!.isNotEmpty
+                      ? Image.network(
+                          ApiConfig.imageUrl(_categoryImages[category.id]!),
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Icon(
+                            category.materialIcon,
+                            color: AppTheme.primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Category name
+              Text(
+                category.name,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? Colors.white : const Color(0xFF1A1A1A),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildModernSelectCategoryPrompt() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryColor : AppTheme.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: _primaryColorWithOpacity,
+                shape: BoxShape.circle,
               ),
               child: Icon(
-                category.materialIcon,
-                color: isSelected ? Colors.white : AppTheme.primaryColor,
-                size: 20,
+                Icons.category_outlined,
+                size: 40,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Select a category to browse',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF6B7280),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              category.name,
+              'Choose from our collection',
               style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? AppTheme.primaryColor : const Color(0xFF1A1A1A),
+                fontSize: 14,
+                color: Colors.grey[600],
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -266,64 +450,49 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildSelectCategoryPrompt() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.touch_app_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'Select a category',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubcategoriesGrid() {
+  Widget _buildModernSubcategoriesGrid() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Header
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 20, 16, 20),
           color: Colors.white,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                _selectedCategory?.name ?? '',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _primaryColorWithOpacity,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${_selectedSubcategories.length} subcategories',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF999999),
+                child: Text(
+                  _selectedCategory?.name ?? '',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.primaryColor,
+                  ),
                 ),
               ),
             ],
           ),
         ),
+        const SizedBox(height: 8),
+        // Grid
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.85,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
             ),
             itemCount: _selectedSubcategories.length,
             itemBuilder: (context, index) {
               final subcategory = _selectedSubcategories[index];
-              return _buildSubcategoryCard(
+              return _buildModernSubcategoryCard(
                 subcategory: subcategory,
                 onTap: () {
                   Navigator.push(
@@ -344,19 +513,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildSubcategoryCard({
+  Widget _buildModernSubcategoryCard({
     required Subcategory subcategory,
     required VoidCallback onTap,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: _blackWithOpacity,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -364,51 +533,74 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: double.infinity,
+                  height: 120,
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppTheme.primaryColor.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    subcategory.materialIcon,
-                    color: AppTheme.primaryColor,
-                    size: 24,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: _subcategoryImages.containsKey(subcategory.id) && _subcategoryImages[subcategory.id]!.isNotEmpty
+                        ? Image.network(
+                            ApiConfig.imageUrl(_subcategoryImages[subcategory.id]!),
+                            width: double.infinity,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            subcategory.materialIcon,
+                            color: AppTheme.primaryColor,
+                            size: 40,
+                          ),
+                        ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: Text(
-                    subcategory.name,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 12),
+                // Title
+                Text(
+                  subcategory.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1A1A),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                if (subcategory.productCount > 0) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    '${subcategory.productCount} items',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF999999),
-                      fontWeight: FontWeight.w500,
+                const SizedBox(height: 8),
+                // Product count
+                Row(
+                  children: [
+                    Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 16,
+                      color: AppTheme.primaryColor,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      '${subcategory.productCount} products',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -417,4 +609,3 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 }
-
